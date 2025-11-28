@@ -4,6 +4,91 @@ let selectedBooks = [];
 let searchResults = [];
 let lastSearchData = null;
 
+// 모바일 감지 함수
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// 적절한 링크 선택 함수
+function getAppropriateLink(store) {
+  const mobile = isMobile();
+  const book = store.books[0];
+
+  if (!book) return '#';
+
+  // 모바일이면 모바일 링크, PC면 PC 링크
+  if (mobile && book.mobileStoreLink) {
+    return book.mobileStoreLink;
+  }
+
+  return book.storeLink || '#';
+}
+
+// 딥링크 시도 함수 (모바일 앱 열기)
+function openStoreLink(store, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const book = store.books[0];
+  if (!book) return;
+
+  const mobile = isMobile();
+  const mobileLink = book.mobileStoreLink;
+  const pcLink = book.storeLink;
+
+  if (!mobile) {
+    // PC는 그냥 PC 링크 열기
+    window.open(pcLink || '#', '_blank');
+    return;
+  }
+
+  // 모바일: 딥링크 시도 후 폴백
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  if (isAndroid && mobileLink) {
+    // Android Intent URL 사용 (앱이 있으면 열고, 없으면 웹으로)
+    // SC 파라미터 추출
+    const scMatch = mobileLink.match(/sc=(\d+)/i);
+    const cidMatch = mobileLink.match(/cid=(\d+)/i);
+
+    if (scMatch && cidMatch) {
+      const intentUrl = `intent://store?sc=${scMatch[1]}&cid=${cidMatch[1]}#Intent;` +
+                        `scheme=aladin;` +
+                        `package=com.aladin.app;` +
+                        `S.browser_fallback_url=${encodeURIComponent(mobileLink)};` +
+                        `end;`;
+
+      window.location.href = intentUrl;
+      return;
+    }
+  }
+
+  // iOS 또는 Intent URL 생성 실패 시: 딥링크 시도 후 웹으로 폴백
+  if (mobileLink) {
+    const scMatch = mobileLink.match(/sc=(\d+)/i);
+    const cidMatch = mobileLink.match(/cid=(\d+)/i);
+
+    if (scMatch && cidMatch) {
+      // 딥링크 시도
+      const deepLink = `aladin://store?sc=${scMatch[1]}&cid=${cidMatch[1]}`;
+
+      // 딥링크 시도
+      window.location.href = deepLink;
+
+      // 1.5초 후 앱이 열리지 않으면 웹으로 폴백
+      setTimeout(() => {
+        window.location.href = mobileLink;
+      }, 1500);
+      return;
+    }
+  }
+
+  // 폴백: 모바일 웹 링크 열기
+  window.open(mobileLink || pcLink || '#', '_blank');
+}
+
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
 const searchResultsDiv = document.getElementById('searchResults');
@@ -276,14 +361,14 @@ function displayStoreResults(data) {
       </li>
     `).join('');
 
-    // Get store link from the first book (all books have the same store link)
-    const storeLink = store.books[0]?.storeLink || '#';
-    console.log(`매장 ${store.storeName} 링크:`, storeLink);
+    // Get appropriate link based on device (mobile/PC)
+    const storeLink = getAppropriateLink(store);
+    console.log(`매장 ${store.storeName} 링크 (${isMobile() ? 'Mobile' : 'PC'}):`, storeLink);
 
     storeCard.innerHTML = `
       <div class="store-card-header">
         <h3>${index + 1}. ${store.storeName}</h3>
-        <button class="store-link-btn" onclick="window.open('${storeLink}', '_blank'); event.stopPropagation();">
+        <button class="store-link-btn">
           매장 바로가기 →
         </button>
       </div>
@@ -293,11 +378,13 @@ function displayStoreResults(data) {
       </ul>
     `;
 
+    // 버튼 클릭 이벤트
+    const button = storeCard.querySelector('.store-link-btn');
+    button.addEventListener('click', (e) => openStoreLink(store, e));
+
     // Make entire card clickable
     storeCard.style.cursor = 'pointer';
-    storeCard.addEventListener('click', () => {
-      window.open(storeLink, '_blank');
-    });
+    storeCard.addEventListener('click', () => openStoreLink(store));
 
     storeResultsDiv.appendChild(storeCard);
   });
@@ -320,14 +407,14 @@ function displayStoreResults(data) {
       </li>
     `).join('');
 
-    // Get store link from the first book
-    const storeLink = store.books[0]?.storeLink || '#';
-    console.log(`매장 ${store.storeName} 링크:`, storeLink);
+    // Get appropriate link based on device (mobile/PC)
+    const storeLink = getAppropriateLink(store);
+    console.log(`매장 ${store.storeName} 링크 (${isMobile() ? 'Mobile' : 'PC'}):`, storeLink);
 
     storeCard.innerHTML = `
       <div class="store-card-header">
         <h3>${freeShippingStores.length + index + 1}. ${store.storeName}</h3>
-        <button class="store-link-btn" onclick="window.open('${storeLink}', '_blank'); event.stopPropagation();">
+        <button class="store-link-btn">
           매장 바로가기 →
         </button>
       </div>
@@ -337,11 +424,13 @@ function displayStoreResults(data) {
       </ul>
     `;
 
+    // 버튼 클릭 이벤트
+    const button = storeCard.querySelector('.store-link-btn');
+    button.addEventListener('click', (e) => openStoreLink(store, e));
+
     // Make entire card clickable
     storeCard.style.cursor = 'pointer';
-    storeCard.addEventListener('click', () => {
-      window.open(storeLink, '_blank');
-    });
+    storeCard.addEventListener('click', () => openStoreLink(store));
 
     storeResultsDiv.appendChild(storeCard);
   });

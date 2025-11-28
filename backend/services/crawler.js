@@ -39,9 +39,21 @@ async function getUsedBookStores(itemId, isbn13, priceStandard) {
       const storeText = $(element).text().trim();
       const storeName = storeText.replace('중고매장', '').trim();
 
-      // 매장 링크 추출
+      // 매장 링크 추출 (PC용)
       const storeLink = $(element).find('a').attr('href');
       const fullStoreLink = storeLink ? `https://www.aladin.co.kr${storeLink}` : null;
+
+      // 모바일 링크 생성
+      let mobileStoreLink = null;
+      if (storeLink) {
+        // /shop/usedshop/wshopitem.aspx?SC=827148&CID=0 형태에서
+        // /m/usedshop/c2cshop.aspx?sc=827148&cid=0 형태로 변환
+        const scMatch = storeLink.match(/SC=(\d+)/i);
+        const cidMatch = storeLink.match(/CID=(\d+)/i);
+        if (scMatch && cidMatch) {
+          mobileStoreLink = `https://www.aladin.co.kr/m/usedshop/c2cshop.aspx?sc=${scMatch[1]}&cid=${cidMatch[1]}`;
+        }
+      }
 
       if (priceElements[index]) {
         const priceText = $(priceElements[index]).text().trim();
@@ -60,7 +72,8 @@ async function getUsedBookStores(itemId, isbn13, priceStandard) {
                 condition,
                 price,
                 stock: 1,
-                storeLink: fullStoreLink
+                storeLink: fullStoreLink,
+                mobileStoreLink: mobileStoreLink
               });
             } else if (existingStore.price < price) {
               // 더 높은 가격으로 업데이트 (더 좋은 상태로 추정)
@@ -114,7 +127,8 @@ async function findStoresWithBooks(books, minTotalPrice = 20000) {
           condition: store.condition,
           price: store.price,
           stock: store.stock,
-          storeLink: store.storeLink
+          storeLink: store.storeLink,
+          mobileStoreLink: store.mobileStoreLink
         });
       });
     });
