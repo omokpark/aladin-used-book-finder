@@ -1,0 +1,17 @@
+{
+  "name": "aladin-used-book-finder",
+  "version": "1.0.0",
+  "description": "알라딘 중고서점 재고 검색 웹 애플리케이션",
+  "main": "backend/server.js",
+  "scripts": {
+    "install-backend": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev"
+  },
+  "keywords": ["aladin", "used-books", "crawler"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
