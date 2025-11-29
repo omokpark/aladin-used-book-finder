@@ -25,7 +25,7 @@ function getAppropriateLink(store) {
   return book.storeLink || '#';
 }
 
-// 딥링크 시도 함수 (모바일 앱 열기)
+// Universal Link 방식으로 매장 링크 열기
 function openStoreLink(store, event) {
   if (event) {
     event.preventDefault();
@@ -39,55 +39,16 @@ function openStoreLink(store, event) {
   const mobileLink = book.mobileStoreLink;
   const pcLink = book.storeLink;
 
-  if (!mobile) {
-    // PC는 그냥 PC 링크 열기
+  if (mobile && mobileLink) {
+    // 모바일: Universal Link 방식
+    // 현재 창에서 모바일 URL 열기
+    // 알라딘 앱이 설치되어 있으면 자동으로 앱 실행
+    // 없으면 웹 브라우저로 열림
+    window.location.href = mobileLink;
+  } else {
+    // PC: 새 탭에서 PC 링크 열기
     window.open(pcLink || '#', '_blank');
-    return;
   }
-
-  // 모바일: 딥링크 시도 후 폴백
-  const isAndroid = /Android/i.test(navigator.userAgent);
-
-  if (isAndroid && mobileLink) {
-    // Android Intent URL 사용 (앱이 있으면 열고, 없으면 웹으로)
-    // SC 파라미터 추출
-    const scMatch = mobileLink.match(/sc=(\d+)/i);
-    const cidMatch = mobileLink.match(/cid=(\d+)/i);
-
-    if (scMatch && cidMatch) {
-      const intentUrl = `intent://store?sc=${scMatch[1]}&cid=${cidMatch[1]}#Intent;` +
-                        `scheme=aladin;` +
-                        `package=com.aladin.app;` +
-                        `S.browser_fallback_url=${encodeURIComponent(mobileLink)};` +
-                        `end;`;
-
-      window.location.href = intentUrl;
-      return;
-    }
-  }
-
-  // iOS 또는 Intent URL 생성 실패 시: 딥링크 시도 후 웹으로 폴백
-  if (mobileLink) {
-    const scMatch = mobileLink.match(/sc=(\d+)/i);
-    const cidMatch = mobileLink.match(/cid=(\d+)/i);
-
-    if (scMatch && cidMatch) {
-      // 딥링크 시도
-      const deepLink = `aladin://store?sc=${scMatch[1]}&cid=${cidMatch[1]}`;
-
-      // 딥링크 시도
-      window.location.href = deepLink;
-
-      // 1.5초 후 앱이 열리지 않으면 웹으로 폴백
-      setTimeout(() => {
-        window.location.href = mobileLink;
-      }, 1500);
-      return;
-    }
-  }
-
-  // 폴백: 모바일 웹 링크 열기
-  window.open(mobileLink || pcLink || '#', '_blank');
 }
 
 const searchInput = document.getElementById('searchInput');
