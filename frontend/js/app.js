@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+// 배포 환경에 따라 자동으로 API URL 설정
+const API_BASE_URL = window.location.origin + '/api';
 
 let selectedBooks = [];
 let searchResults = [];
