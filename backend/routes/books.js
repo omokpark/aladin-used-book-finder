@@ -40,15 +40,15 @@ router.get('/detail/:isbn13', async (req, res) => {
   }
 });
 
-router.get('/used-stores/:isbn13', async (req, res) => {
+router.get('/used-stores/:itemId', async (req, res) => {
   try {
-    const { isbn13 } = req.params;
+    const { itemId } = req.params;
 
-    if (!isbn13) {
-      return res.status(400).json({ error: 'ISBN13 is required' });
+    if (!itemId) {
+      return res.status(400).json({ error: 'ItemId is required' });
     }
 
-    const stores = await getUsedBookStores(isbn13);
+    const stores = await getUsedBookStores(itemId);
     res.json({ success: true, stores });
   } catch (error) {
     console.error('Used stores error:', error);

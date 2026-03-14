@@ -286,19 +286,22 @@ h2 {
   margin-bottom: 15px;
 }
 
-.store-card .book-list {
+.store-card .book-list,
+.store-card-no-free-shipping .book-list {
   list-style: none;
   padding: 0;
 }
 
-.store-card .book-list li {
+.store-card .book-list li,
+.store-card-no-free-shipping .book-list li {
   padding: 10px;
   border-bottom: 1px solid #ddd;
   display: flex;
   justify-content: space-between;
 }
 
-.store-card .book-list li:last-child {
+.store-card .book-list li:last-child,
+.store-card-no-free-shipping .book-list li:last-child {
   border-bottom: none;
 }
 
@@ -329,22 +332,6 @@ h2 {
   font-weight: 600;
   color: #667eea;
   margin-bottom: 15px;
-}
-
-.store-card-no-free-shipping .book-list {
-  list-style: none;
-  padding: 0;
-}
-
-.store-card-no-free-shipping .book-list li {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-}
-
-.store-card-no-free-shipping .book-list li:last-child {
-  border-bottom: none;
 }
 
 .empty-message {

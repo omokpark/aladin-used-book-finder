@@ -148,6 +148,9 @@ function updateSelectedBooks() {
     return;
   }
 
+  const total = selectedBooks.reduce((sum, book) => sum + (book.priceStandard || 0), 0);
+  totalPriceSpan.textContent = total.toLocaleString();
+
   selectedBooksDiv.innerHTML = '';
 
   selectedBooks.forEach((book, index) => {
@@ -196,10 +199,6 @@ async function findStores() {
     alert('최소 1권 이상의 책을 선택해주세요');
     return;
   }
-
-  console.log('=== 매장 찾기 시작 ===');
-  console.log('선택한 책 수:', selectedBooks.length);
-  console.log('선택한 책 목록:', selectedBooks.map(b => b.title));
 
   loadingOverlay.classList.remove('hidden');
   storeResultsDiv.innerHTML = '<p class="empty-message">매장을 검색하는 중입니다...</p>';
@@ -323,10 +322,6 @@ function displayStoreResults(data) {
       </li>
     `).join('');
 
-    // Get appropriate link based on device (mobile/PC)
-    const storeLink = getAppropriateLink(store);
-    console.log(`매장 ${store.storeName} 링크 (${isMobile() ? 'Mobile' : 'PC'}):`, storeLink);
-
     storeCard.innerHTML = `
       <div class="store-card-header">
         <h3>${index + 1}. ${store.storeName}</h3>
@@ -368,10 +363,6 @@ function displayStoreResults(data) {
         </div>
       </li>
     `).join('');
-
-    // Get appropriate link based on device (mobile/PC)
-    const storeLink = getAppropriateLink(store);
-    console.log(`매장 ${store.storeName} 링크 (${isMobile() ? 'Mobile' : 'PC'}):`, storeLink);
 
     storeCard.innerHTML = `
       <div class="store-card-header">
