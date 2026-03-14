@@ -95,3 +95,26 @@ POST /api/books/find-stores        여러 책 보유 매장 검색 (크롤링)
 - 프론트엔드 수정 후 별도 빌드 과정 없음 (Vanilla JS)
 - GitHub `main` 브랜치 푸시 → Render 자동 배포
 - 로컬에서 `cd backend && npm run dev` 로 실행
+
+## Git 워크플로
+
+작업 디렉토리: `C:\Users\lovem\aladin-used-book-finder`
+
+### 작업 시작 시 (pull)
+```bash
+git pull origin main
+```
+GitHub 최신 코드를 받아온 후 작업을 시작합니다.
+
+### 작업 완료 시 (commit & push)
+```bash
+git add 파일명        # 변경 파일 지정 (git add -A 사용 자제)
+git commit -m "작업 내용 요약"
+git push origin main
+```
+푸시 후 Render가 자동으로 재배포합니다 (약 1~2분 소요).
+
+### 주의사항
+- 작업 전 반드시 `git pull` 먼저 실행
+- `.env`, `node_modules/`, `.claude/` 는 절대 커밋하지 않음 (gitignore 처리됨)
+- 커밋 메시지는 변경 내용이 명확히 드러나도록 작성
