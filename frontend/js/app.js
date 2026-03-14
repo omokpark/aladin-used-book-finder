@@ -5,6 +5,23 @@ let selectedBooks = [];
 let searchResults = [];
 let lastSearchData = null;
 
+// XSS 방지: HTML 특수문자 이스케이프
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// 이미지 URL 검증 (javascript: 프로토콜 차단)
+function safeSrc(url) {
+  if (!url) return '';
+  return url.startsWith('http://') || url.startsWith('https://') ? url : '';
+}
+
 // 모바일 감지 함수
 function isMobile() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -17,7 +34,6 @@ function getAppropriateLink(store) {
 
   if (!book) return '#';
 
-  // 모바일이면 모바일 링크, PC면 PC 링크
   if (mobile && book.mobileStoreLink) {
     return book.mobileStoreLink;
   }
@@ -40,13 +56,8 @@ function openStoreLink(store, event) {
   const pcLink = book.storeLink;
 
   if (mobile && mobileLink) {
-    // 모바일: Universal Link 방식
-    // 현재 창에서 모바일 URL 열기
-    // 알라딘 앱이 설치되어 있으면 자동으로 앱 실행
-    // 없으면 웹 브라우저로 열림
     window.location.href = mobileLink;
   } else {
-    // PC: 새 탭에서 PC 링크 열기
     window.open(pcLink || '#', '_blank');
   }
 }
@@ -91,7 +102,6 @@ async function searchBooks() {
       searchResultsDiv.innerHTML = '<p class="no-results">검색 결과가 없습니다</p>';
     }
   } catch (error) {
-    console.error('Search error:', error);
     searchResultsDiv.innerHTML = '<p class="no-results">검색 중 오류가 발생했습니다</p>';
   }
 }
@@ -107,12 +117,23 @@ function displaySearchResults(books) {
       bookCard.classList.add('selected');
     }
 
-    bookCard.innerHTML = `
-      <img src="${book.cover}" alt="${book.title}" />
-      <h3>${book.title}</h3>
-      <p>${book.author}</p>
-      <p>${book.publisher}</p>
-    `;
+    const img = document.createElement('img');
+    img.src = safeSrc(book.cover);
+    img.alt = escapeHtml(book.title);
+
+    const h3 = document.createElement('h3');
+    h3.textContent = book.title;
+
+    const pAuthor = document.createElement('p');
+    pAuthor.textContent = book.author;
+
+    const pPublisher = document.createElement('p');
+    pPublisher.textContent = book.publisher;
+
+    bookCard.appendChild(img);
+    bookCard.appendChild(h3);
+    bookCard.appendChild(pAuthor);
+    bookCard.appendChild(pPublisher);
 
     bookCard.addEventListener('click', () => toggleBookSelection(book, bookCard));
 
@@ -157,16 +178,25 @@ function updateSelectedBooks() {
     const bookItem = document.createElement('div');
     bookItem.className = 'selected-book-item';
 
-    bookItem.innerHTML = `
-      <div class="selected-book-info">
-        <h4>${book.title}</h4>
-        <p>${book.author} | ${book.publisher}</p>
-      </div>
-      <button class="remove-btn" data-index="${index}">제거</button>
-    `;
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'selected-book-info';
 
-    const removeBtn = bookItem.querySelector('.remove-btn');
+    const h4 = document.createElement('h4');
+    h4.textContent = book.title;
+
+    const p = document.createElement('p');
+    p.textContent = `${book.author} | ${book.publisher}`;
+
+    infoDiv.appendChild(h4);
+    infoDiv.appendChild(p);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-btn';
+    removeBtn.textContent = '제거';
     removeBtn.addEventListener('click', () => removeBook(index));
+
+    bookItem.appendChild(infoDiv);
+    bookItem.appendChild(removeBtn);
 
     selectedBooksDiv.appendChild(bookItem);
   });
@@ -224,22 +254,57 @@ async function findStores() {
       storeResultsDiv.innerHTML = '<p class="no-results">매장 검색 중 오류가 발생했습니다</p>';
     }
   } catch (error) {
-    console.error('Find stores error:', error);
     storeResultsDiv.innerHTML = '<p class="no-results">매장 검색 중 오류가 발생했습니다</p>';
   } finally {
     loadingOverlay.classList.add('hidden');
   }
 }
 
+function buildBookListHTML(books) {
+  return books.map(book => `
+    <li>
+      <div>
+        <strong>${escapeHtml(book.title)}</strong><br/>
+        <small>${escapeHtml(book.author)} | 상태: ${escapeHtml(book.condition)}</small>
+      </div>
+      <div style="text-align: right;">
+        <strong>${book.price.toLocaleString()}원</strong><br/>
+        <small>재고: ${book.stock}권</small>
+      </div>
+    </li>
+  `).join('');
+}
+
+function buildStoreCard(store, label, cardClass, priceClass, priceLabel) {
+  const storeCard = document.createElement('div');
+  storeCard.className = `${cardClass} store-card-clickable`;
+
+  storeCard.innerHTML = `
+    <div class="store-card-header">
+      <h3>${escapeHtml(label)}. ${escapeHtml(store.storeName)}</h3>
+      <button class="store-link-btn">매장 바로가기 →</button>
+    </div>
+    <p class="${priceClass}">합계: ${store.totalPrice.toLocaleString()}원 ${priceLabel}</p>
+    <ul class="book-list">
+      ${buildBookListHTML(store.books)}
+    </ul>
+  `;
+
+  const button = storeCard.querySelector('.store-link-btn');
+  button.addEventListener('click', (e) => openStoreLink(store, e));
+  storeCard.style.cursor = 'pointer';
+  storeCard.addEventListener('click', () => openStoreLink(store));
+
+  return storeCard;
+}
+
 function displayStoreResults(data) {
   storeResultsDiv.innerHTML = '';
 
-  // Get all stores that have at least one book from backend response
   const allStoresWithAnyBooks = data.booksWithStores
     .flatMap(book => book.stores.map(store => store.storeName))
     .filter((storeName, index, self) => self.indexOf(storeName) === index);
 
-  // If no stores have any of the selected books at all
   if (allStoresWithAnyBooks.length === 0) {
     const noResultDiv = document.createElement('div');
     noResultDiv.className = 'no-results';
@@ -252,10 +317,7 @@ function displayStoreResults(data) {
   }
 
   const summary = document.createElement('div');
-  summary.style.marginBottom = '20px';
-  summary.style.padding = '15px';
-  summary.style.background = '#e7f3ff';
-  summary.style.borderRadius = '8px';
+  summary.style.cssText = 'margin-bottom:20px;padding:15px;background:#e7f3ff;border-radius:8px;';
 
   if (data.validStores.length > 0) {
     summary.innerHTML = `
@@ -267,21 +329,16 @@ function displayStoreResults(data) {
     summary.innerHTML = `
       <p><strong>⚠️ 2만원 이상 매장 없음</strong></p>
       <p><strong>📚 일부 재고 보유 매장:</strong> ${allStoresWithAnyBooks.length}개 (총 ${data.totalStoresChecked}개 매장 확인)</p>
-      <p style="color: #dc3545; margin-top: 10px;">아래 매장들은 선택한 책 중 일부를 보유하고 있지만 합계가 2만원 미만입니다. (배송비 별도)</p>
+      <p style="color:#dc3545;margin-top:10px;">아래 매장들은 선택한 책 중 일부를 보유하고 있지만 합계가 2만원 미만입니다. (배송비 별도)</p>
     `;
   }
   storeResultsDiv.appendChild(summary);
 
-  // Create a map of store data from booksWithStores
   const storeDataMap = new Map();
   data.booksWithStores.forEach(book => {
     book.stores.forEach(store => {
       if (!storeDataMap.has(store.storeName)) {
-        storeDataMap.set(store.storeName, {
-          storeName: store.storeName,
-          books: [],
-          totalPrice: 0
-        });
+        storeDataMap.set(store.storeName, { storeName: store.storeName, books: [], totalPrice: 0 });
       }
       const storeData = storeDataMap.get(store.storeName);
       storeData.books.push({
@@ -290,112 +347,45 @@ function displayStoreResults(data) {
         condition: store.condition,
         price: store.price,
         stock: store.stock,
-        storeLink: store.storeLink
+        storeLink: store.storeLink,
+        mobileStoreLink: store.mobileStoreLink
       });
       storeData.totalPrice += store.price;
     });
   });
 
-  // Convert to array and sort by price
   const allStores = Array.from(storeDataMap.values())
-    .sort((a, b) => b.totalPrice - a.totalPrice); // Sort by highest price first
+    .sort((a, b) => b.totalPrice - a.totalPrice);
 
-  // Separate into free shipping and paid shipping stores
   const freeShippingStores = allStores.filter(store => store.totalPrice >= data.minTotalPrice);
   const paidShippingStores = allStores.filter(store => store.totalPrice < data.minTotalPrice);
 
-  // Display free shipping stores first
   freeShippingStores.forEach((store, index) => {
-    const storeCard = document.createElement('div');
-    storeCard.className = 'store-card store-card-clickable';
-
-    const bookListHTML = store.books.map(book => `
-      <li>
-        <div>
-          <strong>${book.title}</strong><br/>
-          <small>${book.author} | 상태: ${book.condition}</small>
-        </div>
-        <div style="text-align: right;">
-          <strong>${book.price.toLocaleString()}원</strong><br/>
-          <small>재고: ${book.stock}권</small>
-        </div>
-      </li>
-    `).join('');
-
-    storeCard.innerHTML = `
-      <div class="store-card-header">
-        <h3>${index + 1}. ${store.storeName}</h3>
-        <button class="store-link-btn">
-          매장 바로가기 →
-        </button>
-      </div>
-      <p class="total-price">합계: ${store.totalPrice.toLocaleString()}원 <span style="color: #28a745;">✓ 무료배송</span></p>
-      <ul class="book-list">
-        ${bookListHTML}
-      </ul>
-    `;
-
-    // 버튼 클릭 이벤트
-    const button = storeCard.querySelector('.store-link-btn');
-    button.addEventListener('click', (e) => openStoreLink(store, e));
-
-    // Make entire card clickable
-    storeCard.style.cursor = 'pointer';
-    storeCard.addEventListener('click', () => openStoreLink(store));
-
-    storeResultsDiv.appendChild(storeCard);
+    const card = buildStoreCard(
+      store,
+      `${index + 1}`,
+      'store-card',
+      'total-price',
+      '<span style="color:#28a745;">✓ 무료배송</span>'
+    );
+    storeResultsDiv.appendChild(card);
   });
 
-  // Display paid shipping stores after
   paidShippingStores.forEach((store, index) => {
-    const storeCard = document.createElement('div');
-    storeCard.className = 'store-card-no-free-shipping store-card-clickable';
-
-    const bookListHTML = store.books.map(book => `
-      <li>
-        <div>
-          <strong>${book.title}</strong><br/>
-          <small>${book.author} | 상태: ${book.condition}</small>
-        </div>
-        <div style="text-align: right;">
-          <strong>${book.price.toLocaleString()}원</strong><br/>
-          <small>재고: ${book.stock}권</small>
-        </div>
-      </li>
-    `).join('');
-
-    storeCard.innerHTML = `
-      <div class="store-card-header">
-        <h3>${freeShippingStores.length + index + 1}. ${store.storeName}</h3>
-        <button class="store-link-btn">
-          매장 바로가기 →
-        </button>
-      </div>
-      <p class="total-price-no-shipping">합계: ${store.totalPrice.toLocaleString()}원 <span style="color: #dc3545;">+ 배송비 2,500원</span></p>
-      <ul class="book-list">
-        ${bookListHTML}
-      </ul>
-    `;
-
-    // 버튼 클릭 이벤트
-    const button = storeCard.querySelector('.store-link-btn');
-    button.addEventListener('click', (e) => openStoreLink(store, e));
-
-    // Make entire card clickable
-    storeCard.style.cursor = 'pointer';
-    storeCard.addEventListener('click', () => openStoreLink(store));
-
-    storeResultsDiv.appendChild(storeCard);
+    const card = buildStoreCard(
+      store,
+      `${freeShippingStores.length + index + 1}`,
+      'store-card-no-free-shipping',
+      'total-price-no-shipping',
+      '<span style="color:#dc3545;">+ 배송비 2,500원</span>'
+    );
+    storeResultsDiv.appendChild(card);
   });
 
-  // Add button to view detailed partial results if no stores have all books
   if (data.allStoresWithBooks.length === 0 && allStoresWithAnyBooks.length > 0) {
     const buttonContainer = document.createElement('div');
-    buttonContainer.style.marginTop = '20px';
-    buttonContainer.style.textAlign = 'center';
-    buttonContainer.innerHTML = `
-      <button class="detail-btn" id="showPartialBtn">도서별 상세 재고 내역 보기</button>
-    `;
+    buttonContainer.style.cssText = 'margin-top:20px;text-align:center;';
+    buttonContainer.innerHTML = `<button class="detail-btn" id="showPartialBtn">도서별 상세 재고 내역 보기</button>`;
     storeResultsDiv.appendChild(buttonContainer);
 
     document.getElementById('showPartialBtn').addEventListener('click', () => {
@@ -408,18 +398,14 @@ function displayPartialStoreResults(data) {
   storeResultsDiv.innerHTML = '';
 
   const header = document.createElement('div');
-  header.style.marginBottom = '20px';
-  header.style.padding = '15px';
-  header.style.background = '#fff3cd';
-  header.style.borderRadius = '8px';
-  header.style.border = '2px solid #ffc107';
+  header.style.cssText = 'margin-bottom:20px;padding:15px;background:#fff3cd;border-radius:8px;border:2px solid #ffc107;';
   header.innerHTML = `
-    <h3 style="color: #856404; margin-bottom: 10px;">📋 부분 재고 내역</h3>
+    <h3 style="color:#856404;margin-bottom:10px;">📋 부분 재고 내역</h3>
     <p>선택한 책들 중 일부를 보유한 매장들의 정보입니다.</p>
   `;
   storeResultsDiv.appendChild(header);
 
-  data.booksWithStores.forEach((book, bookIndex) => {
+  data.booksWithStores.forEach((book) => {
     const bookSection = document.createElement('div');
     bookSection.className = 'partial-book-section';
 
@@ -427,33 +413,43 @@ function displayPartialStoreResults(data) {
     bookHeader.className = 'partial-book-header';
 
     if (book.stores.length === 0) {
-      bookHeader.innerHTML = `
-        <h4>${book.title}</h4>
-        <p>${book.author} | ${book.publisher}</p>
-        <p class="store-count no-stock">❌ 재고 없음</p>
-      `;
+      const h4 = document.createElement('h4');
+      h4.textContent = book.title;
+      const pMeta = document.createElement('p');
+      pMeta.textContent = `${book.author} | ${book.publisher}`;
+      const pStock = document.createElement('p');
+      pStock.className = 'store-count no-stock';
+      pStock.textContent = '❌ 재고 없음';
+      bookHeader.appendChild(h4);
+      bookHeader.appendChild(pMeta);
+      bookHeader.appendChild(pStock);
       bookSection.appendChild(bookHeader);
       storeResultsDiv.appendChild(bookSection);
       return;
     }
 
-    bookHeader.innerHTML = `
-      <h4>${book.title}</h4>
-      <p>${book.author} | ${book.publisher}</p>
-      <p class="store-count">✅ ${book.stores.length}개 매장에서 판매 중</p>
-    `;
+    const h4 = document.createElement('h4');
+    h4.textContent = book.title;
+    const pMeta = document.createElement('p');
+    pMeta.textContent = `${book.author} | ${book.publisher}`;
+    const pCount = document.createElement('p');
+    pCount.className = 'store-count';
+    pCount.textContent = `✅ ${book.stores.length}개 매장에서 판매 중`;
+    bookHeader.appendChild(h4);
+    bookHeader.appendChild(pMeta);
+    bookHeader.appendChild(pCount);
     bookSection.appendChild(bookHeader);
 
     const storeList = document.createElement('div');
     storeList.className = 'partial-store-list';
 
-    book.stores.forEach((store, index) => {
+    book.stores.forEach((store) => {
       const storeItem = document.createElement('div');
       storeItem.className = 'partial-store-item';
       storeItem.innerHTML = `
         <div class="store-info">
-          <strong>${store.storeName}</strong>
-          <span class="condition-badge">${store.condition}</span>
+          <strong>${escapeHtml(store.storeName)}</strong>
+          <span class="condition-badge">${escapeHtml(store.condition)}</span>
         </div>
         <div class="price-info">
           <strong>${store.price.toLocaleString()}원</strong>
@@ -468,11 +464,8 @@ function displayPartialStoreResults(data) {
   });
 
   const backButton = document.createElement('div');
-  backButton.style.marginTop = '20px';
-  backButton.style.textAlign = 'center';
-  backButton.innerHTML = `
-    <button class="detail-btn" id="backBtn">돌아가기</button>
-  `;
+  backButton.style.cssText = 'margin-top:20px;text-align:center;';
+  backButton.innerHTML = `<button class="detail-btn" id="backBtn">돌아가기</button>`;
   storeResultsDiv.appendChild(backButton);
 
   document.getElementById('backBtn').addEventListener('click', () => {

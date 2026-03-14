@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const ALADIN_API_BASE_URL = 'http://www.aladin.co.kr/ttb/api';
+const ALADIN_API_BASE_URL = 'https://www.aladin.co.kr/ttb/api';
 const TTB_KEY = process.env.ALADIN_API_KEY;
 
 async function searchBooks(query, maxResults = 20) {
