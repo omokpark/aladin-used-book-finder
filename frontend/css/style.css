@@ -500,22 +500,182 @@ footer {
   100% { transform: rotate(360deg); }
 }
 
+/* 탭 네비게이터 - PC에서는 숨김 */
+.step-tabs {
+  display: none;
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.tab-badge.hidden {
+  display: none;
+}
+
+/* 아코디언 버튼 - 기본 숨김, 모바일에서만 노출 */
+.accordion-toggle-btn {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  /* 전체 레이아웃 */
+  body {
+    padding: 0;
+  }
+
+  .container {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  /* 헤더 컴팩트 */
+  header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   header h1 {
-    font-size: 1.8rem;
+    font-size: 1.2rem;
+    margin-bottom: 0;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  /* 탭 네비게이터 노출 */
+  .step-tabs {
+    display: flex;
+    border-bottom: 2px solid #e0e0e0;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .step-tab {
+    flex: 1;
+    padding: 12px 6px;
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    color: #999;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .step-tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    font-weight: 700;
+  }
+
+  /* 섹션 탭 전환: 비활성 섹션 숨김 */
+  main > section {
+    display: none;
+  }
+
+  main > section.active {
+    display: block;
   }
 
   main {
-    padding: 20px;
+    padding: 16px;
   }
 
+  /* 검색 결과: 가로 스크롤 카드 */
   .search-results {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+    gap: 12px;
+    padding: 10px 4px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
 
+  .search-results::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .search-results::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 2px;
+  }
+
+  .book-card {
+    min-width: 140px;
+    max-width: 140px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
+  /* 선택된 책 */
   .selected-book-item {
     flex-direction: column;
     text-align: center;
     gap: 10px;
+  }
+
+  /* 아코디언 - 모바일에서 활성화 */
+  .accordion-toggle-btn {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #555;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 0;
+  }
+
+  .book-list {
+    display: none;
+    margin-top: 8px;
+  }
+
+  .book-list.open {
+    display: block;
+  }
+
+  /* 매장 카드: 모바일에서 카드 전체 클릭 비활성 */
+  .store-card-clickable {
+    cursor: default;
+  }
+
+  .store-card-clickable:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* 매장 링크 버튼 크게 */
+  .store-link-btn {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  footer {
+    display: none;
   }
 }

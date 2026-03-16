@@ -5,6 +5,28 @@ let selectedBooks = [];
 let searchResults = [];
 let lastSearchData = null;
 
+// ── 모바일 탭 전환 ──────────────────────────────────────────
+const SECTION_CLASSES = ['search-section', 'selected-section', 'result-section'];
+
+function goToStep(step) {
+  SECTION_CLASSES.forEach((cls, i) => {
+    const el = document.querySelector('.' + cls);
+    if (el) el.classList.toggle('active', i + 1 === step);
+  });
+  document.querySelectorAll('.step-tab').forEach(tab => {
+    tab.classList.toggle('active', parseInt(tab.dataset.step) === step);
+  });
+  window.scrollTo(0, 0);
+}
+
+// 탭 버튼 이벤트 및 초기 활성 섹션 설정
+document.querySelectorAll('.step-tab').forEach(tab => {
+  tab.addEventListener('click', () => goToStep(parseInt(tab.dataset.step)));
+});
+// 모바일에서 첫 섹션 활성화
+document.querySelector('.search-section').classList.add('active');
+// ────────────────────────────────────────────────────────────
+
 // XSS 방지: HTML 특수문자 이스케이프
 function escapeHtml(str) {
   if (str == null) return '';
@@ -148,8 +170,8 @@ function toggleBookSelection(book, bookCard) {
     selectedBooks.splice(existingIndex, 1);
     bookCard.classList.remove('selected');
   } else {
-    if (selectedBooks.length >= 5) {
-      alert('최대 5권까지만 선택할 수 있습니다');
+    if (selectedBooks.length >= 3) {
+      alert('최대 3권까지만 선택할 수 있습니다');
       return;
     }
     selectedBooks.push(book);
@@ -161,6 +183,13 @@ function toggleBookSelection(book, bookCard) {
 
 function updateSelectedBooks() {
   selectedCountSpan.textContent = selectedBooks.length;
+
+  // 탭 배지 업데이트
+  const tabBadge = document.getElementById('tabBadge');
+  if (tabBadge) {
+    tabBadge.textContent = selectedBooks.length;
+    tabBadge.classList.toggle('hidden', selectedBooks.length === 0);
+  }
 
   if (selectedBooks.length === 0) {
     selectedBooksDiv.innerHTML = '<p class="empty-message">검색 결과에서 책을 선택해주세요</p>';
@@ -250,6 +279,7 @@ async function findStores() {
     if (data.success) {
       lastSearchData = data;
       displayStoreResults(data);
+      goToStep(3); // 모바일: 결과 탭으로 자동 이동 (PC는 CSS가 무시)
     } else {
       storeResultsDiv.innerHTML = '<p class="no-results">매장 검색 중 오류가 발생했습니다</p>';
     }
@@ -285,15 +315,29 @@ function buildStoreCard(store, label, cardClass, priceClass, priceLabel) {
       <button class="store-link-btn">매장 바로가기 →</button>
     </div>
     <p class="${priceClass}">합계: ${store.totalPrice.toLocaleString()}원 ${priceLabel}</p>
+    <button class="accordion-toggle-btn">책 목록 보기 ▼</button>
     <ul class="book-list">
       ${buildBookListHTML(store.books)}
     </ul>
   `;
 
-  const button = storeCard.querySelector('.store-link-btn');
-  button.addEventListener('click', (e) => openStoreLink(store, e));
-  storeCard.style.cursor = 'pointer';
-  storeCard.addEventListener('click', () => openStoreLink(store));
+  const linkBtn = storeCard.querySelector('.store-link-btn');
+  linkBtn.addEventListener('click', (e) => openStoreLink(store, e));
+
+  // 아코디언 토글 (CSS에서 모바일에만 버튼 노출)
+  const accordionBtn = storeCard.querySelector('.accordion-toggle-btn');
+  const bookList = storeCard.querySelector('.book-list');
+  accordionBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = bookList.classList.toggle('open');
+    accordionBtn.textContent = isOpen ? '책 목록 접기 ▲' : '책 목록 보기 ▼';
+  });
+
+  // PC에서만 카드 전체 클릭으로 매장 이동
+  if (!isMobile()) {
+    storeCard.style.cursor = 'pointer';
+    storeCard.addEventListener('click', () => openStoreLink(store));
+  }
 
   return storeCard;
 }

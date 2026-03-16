@@ -65,6 +65,36 @@ ALLOWED_ORIGIN=https://aladin-used-book-finder.onrender.com
 - **CORS**: `ALLOWED_ORIGIN` 환경변수로 허용 도메인 제한
 - **Rate Limiting**: 전체 API 분당 20회 / `/find-stores` 분당 5회
 
+## 보안 개발 지침 (Claude Code용)
+
+코드를 작성하거나 수정할 때 다음 보안 원칙을 항상 준수합니다.
+
+### 항상 확인할 취약점
+
+| 취약점 | 이 프로젝트에서의 위험 포인트 | 대응 방법 |
+|--------|-------------------------------|-----------|
+| **XSS** | 알라딘 API 응답(책 제목/저자) → DOM 삽입 | `escapeHtml()` / `textContent` 사용, `innerHTML` 최소화 |
+| **Command Injection** | 크롤러가 외부 URL 파라미터 사용 | URL 파라미터는 `encodeURIComponent` 처리 |
+| **Open Redirect** | `storeLink`, `mobileStoreLink` 링크 클릭 | `safeSrc()`로 http/https 외 프로토콜 차단 |
+| **ReDoS** | 사용자 입력 검색어 정규식 처리 시 | 복잡한 정규식 사용 금지 |
+| **Prototype Pollution** | `req.body` 객체 직접 사용 | 필요한 필드만 명시적으로 추출 |
+
+### 코드 작성 규칙
+
+- **API 응답 데이터는 신뢰하지 않는다** — 알라딘 API/크롤링 결과도 DOM에 넣기 전 반드시 이스케이프
+- **DOM 조작은 `textContent` 우선** — `innerHTML`을 써야 할 땐 이스케이프된 데이터만 사용
+- **환경변수는 코드에 하드코딩 금지** — API 키, 시크릿은 반드시 `.env`에만
+- **사용자 입력 검증은 프론트+백엔드 양쪽** — 프론트 검증만으로는 부족
+- **새 라우트 추가 시 Rate Limiting 적용** — `server.js`의 기존 limiter 패턴 참고
+- **외부 URL 링크는 `rel="noopener noreferrer"` 적용** — `target="_blank"` 사용 시 필수
+- **`npm install` 전 패키지 검토** — 불필요한 의존성 추가 자제, 알려진 취약점 확인
+
+### LocalStorage 사용 시 주의 (찜 기능 등 추가 시)
+
+- 저장 전 데이터 크기 제한 확인 (5MB 한도)
+- 저장된 데이터를 DOM에 렌더링할 때도 반드시 `escapeHtml()` 적용
+- 민감 정보(API 키 등)는 절대 LocalStorage에 저장하지 않음
+
 ## API 라우트
 
 ```
@@ -77,7 +107,7 @@ POST /api/books/find-stores        여러 책 보유 매장 검색 (크롤링)
 ## 주요 로직 흐름
 
 1. 사용자가 책 검색 → `aladinAPI.searchBooks()` 호출
-2. 최대 5권 선택 → `selectedBooks` 배열에 저장
+2. 최대 3권 선택 → `selectedBooks` 배열에 저장
 3. "매장 찾기" 클릭 → `POST /api/books/find-stores`
 4. 백엔드에서 각 책마다 `getUsedBookStores(itemId)` 크롤링 (책당 500ms 대기)
 5. 매장별로 보유 책 목록 집계 → 합계 2만원 이상 여부 판단

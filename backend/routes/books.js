@@ -68,8 +68,8 @@ router.post('/find-stores', async (req, res) => {
       return res.status(400).json({ error: 'Books array is required' });
     }
 
-    if (books.length > 5) {
-      return res.status(400).json({ error: 'Maximum 5 books allowed' });
+    if (books.length > 3) {
+      return res.status(400).json({ error: 'Maximum 3 books allowed' });
     }
 
     const minPrice = minTotalPrice || 20000;

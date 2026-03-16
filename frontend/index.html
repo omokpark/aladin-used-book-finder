@@ -13,6 +13,12 @@
       <p class="subtitle">2만원 이상 무료배송 가능한 매장을 찾아드립니다</p>
     </header>
 
+    <nav class="step-tabs" id="stepTabs">
+      <button class="step-tab active" data-step="1">책 검색</button>
+      <button class="step-tab" data-step="2">선택한 책 <span class="tab-badge hidden" id="tabBadge">0</span></button>
+      <button class="step-tab" data-step="3">매장 결과</button>
+    </nav>
+
     <main>
       <section class="search-section">
         <h2>1. 책 검색하기</h2>
@@ -24,12 +30,12 @@
       </section>
 
       <section class="selected-section">
-        <h2>2. 선택한 책 (최대 5권)</h2>
+        <h2>2. 선택한 책 (최대 3권)</h2>
         <div id="selectedBooks" class="selected-books">
           <p class="empty-message">검색 결과에서 책을 선택해주세요</p>
         </div>
         <div class="selected-info">
-          <p>선택한 책: <span id="selectedCount">0</span> / 5권</p>
+          <p>선택한 책: <span id="selectedCount">0</span> / 3권</p>
           <p>합계 금액: <span id="totalPrice">0</span>원</p>
         </div>
         <button id="findStoresBtn" class="find-stores-btn" disabled>매장 찾기</button>
