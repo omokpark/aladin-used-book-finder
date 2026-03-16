@@ -6,7 +6,7 @@ let searchResults = [];
 let lastSearchData = null;
 
 // ── 모바일 탭 전환 ──────────────────────────────────────────
-const SECTION_CLASSES = ['search-section', 'selected-section', 'result-section'];
+const SECTION_CLASSES = ['search-section', 'selected-section', 'result-section', 'saved-section'];
 
 function goToStep(step) {
   SECTION_CLASSES.forEach((cls, i) => {
@@ -25,6 +25,114 @@ document.querySelectorAll('.step-tab').forEach(tab => {
 });
 // 모바일에서 첫 섹션 활성화
 document.querySelector('.search-section').classList.add('active');
+// ────────────────────────────────────────────────────────────
+
+// ── 조회 조합 저장 (LocalStorage) ───────────────────────────
+const SAVED_QUERIES_KEY = 'aladinSavedQueries';
+const MAX_SAVED_QUERIES = 3;
+
+function getSavedQueries() {
+  try {
+    const data = JSON.parse(localStorage.getItem(SAVED_QUERIES_KEY));
+    if (!Array.isArray(data)) return [];
+    return data.filter(q => q && q.id && Array.isArray(q.books) && q.books.length > 0);
+  } catch {
+    return [];
+  }
+}
+
+function saveCurrentQuery() {
+  if (selectedBooks.length === 0) return;
+
+  const queries = getSavedQueries();
+
+  if (queries.length >= MAX_SAVED_QUERIES) {
+    alert(`최대 ${MAX_SAVED_QUERIES}개까지 저장할 수 있습니다.\n"다시 찾기" 탭에서 기존 조합을 삭제해주세요.`);
+    goToStep(4);
+    return;
+  }
+
+  const newIds = selectedBooks.map(b => b.isbn13).sort().join(',');
+  const isDuplicate = queries.some(q =>
+    q.books.map(b => b.isbn13).sort().join(',') === newIds
+  );
+  if (isDuplicate) {
+    alert('이미 저장된 조합입니다.');
+    return;
+  }
+
+  const newQuery = {
+    id: Date.now().toString(),
+    savedAt: new Date().toLocaleDateString('ko-KR'),
+    books: selectedBooks.map(b => ({
+      isbn13: b.isbn13,
+      title: b.title,
+      author: b.author,
+      cover: b.cover,
+      itemId: b.itemId,
+      priceStandard: b.priceStandard,
+      publisher: b.publisher
+    }))
+  };
+
+  queries.push(newQuery);
+  localStorage.setItem(SAVED_QUERIES_KEY, JSON.stringify(queries));
+  renderSavedQueries();
+  alert('저장했습니다! "다시 찾기" 탭에서 확인하세요.');
+}
+
+function deleteSavedQuery(id) {
+  const queries = getSavedQueries().filter(q => q.id !== id);
+  localStorage.setItem(SAVED_QUERIES_KEY, JSON.stringify(queries));
+  renderSavedQueries();
+}
+
+async function runSavedQuery(query) {
+  selectedBooks = [...query.books];
+  updateSelectedBooks();
+  await findStores();
+}
+
+function renderSavedQueries() {
+  const container = document.getElementById('savedQueries');
+  const countEl = document.getElementById('savedCount');
+  const queries = getSavedQueries();
+
+  if (countEl) countEl.textContent = `${queries.length}/${MAX_SAVED_QUERIES}`;
+
+  if (queries.length === 0) {
+    container.innerHTML = '<p class="empty-message">저장된 조합이 없습니다.<br>책을 선택하고 조합을 저장해보세요.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  queries.forEach(query => {
+    const card = document.createElement('div');
+    card.className = 'saved-query-card';
+
+    const tagsHtml = query.books
+      .map(b => `<span class="saved-book-tag">${escapeHtml(b.title)}</span>`)
+      .join('');
+
+    card.innerHTML = `
+      <div class="saved-query-info">
+        <div class="saved-books-list">${tagsHtml}</div>
+        <p class="saved-date">저장일: ${escapeHtml(query.savedAt)}</p>
+      </div>
+      <div class="saved-query-actions">
+        <button class="run-query-btn">조회하기</button>
+        <button class="delete-query-btn">삭제</button>
+      </div>
+    `;
+
+    card.querySelector('.run-query-btn').addEventListener('click', () => runSavedQuery(query));
+    card.querySelector('.delete-query-btn').addEventListener('click', () => {
+      if (confirm('이 조합을 삭제할까요?')) deleteSavedQuery(query.id);
+    });
+
+    container.appendChild(card);
+  });
+}
 // ────────────────────────────────────────────────────────────
 
 // XSS 방지: HTML 특수문자 이스케이프
@@ -91,6 +199,7 @@ const selectedBooksDiv = document.getElementById('selectedBooks');
 const selectedCountSpan = document.getElementById('selectedCount');
 const totalPriceSpan = document.getElementById('totalPrice');
 const findStoresBtn = document.getElementById('findStoresBtn');
+const saveQueryBtn = document.getElementById('saveQueryBtn');
 const storeResultsDiv = document.getElementById('storeResults');
 const loadingOverlay = document.getElementById('loadingOverlay');
 
@@ -102,6 +211,10 @@ searchInput.addEventListener('keypress', (e) => {
 });
 
 findStoresBtn.addEventListener('click', findStores);
+saveQueryBtn.addEventListener('click', saveCurrentQuery);
+
+// 저장된 조합 초기 렌더링
+renderSavedQueries();
 
 async function searchBooks() {
   const query = searchInput.value.trim();
@@ -195,6 +308,7 @@ function updateSelectedBooks() {
     selectedBooksDiv.innerHTML = '<p class="empty-message">검색 결과에서 책을 선택해주세요</p>';
     totalPriceSpan.textContent = '0';
     findStoresBtn.disabled = true;
+    saveQueryBtn.disabled = true;
     return;
   }
 
@@ -231,6 +345,7 @@ function updateSelectedBooks() {
   });
 
   findStoresBtn.disabled = selectedBooks.length === 0;
+  saveQueryBtn.disabled = selectedBooks.length === 0;
 
   updateSearchResultsSelection();
 }

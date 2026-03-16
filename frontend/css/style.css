@@ -500,6 +500,122 @@ footer {
   100% { transform: rotate(360deg); }
 }
 
+/* 저장하기 버튼 */
+.save-query-btn {
+  width: 100%;
+  padding: 12px;
+  background: none;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+
+.save-query-btn:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+}
+
+.save-query-btn:disabled {
+  border-color: #ccc;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 다시 찾기 섹션 */
+.saved-count {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #999;
+  margin-left: 8px;
+}
+
+.saved-query-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.saved-query-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.saved-books-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.saved-book-tag {
+  background: #e7f3ff;
+  color: #0066cc;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.saved-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.saved-query-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.run-query-btn {
+  padding: 8px 16px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.run-query-btn:hover {
+  background: #5568d3;
+}
+
+.delete-query-btn {
+  padding: 8px 16px;
+  background: none;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.delete-query-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
 /* 탭 네비게이터 - PC에서는 숨김 */
 .step-tabs {
   display: none;
@@ -569,10 +685,10 @@ footer {
 
   .step-tab {
     flex: 1;
-    padding: 12px 6px;
+    padding: 12px 4px;
     background: none;
     border: none;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: #999;
     cursor: pointer;
     border-bottom: 3px solid transparent;

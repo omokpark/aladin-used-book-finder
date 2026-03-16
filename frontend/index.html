@@ -14,14 +14,15 @@
     </header>
 
     <nav class="step-tabs" id="stepTabs">
-      <button class="step-tab active" data-step="1">책 검색</button>
-      <button class="step-tab" data-step="2">선택한 책 <span class="tab-badge hidden" id="tabBadge">0</span></button>
-      <button class="step-tab" data-step="3">매장 결과</button>
+      <button class="step-tab active" data-step="1">검색</button>
+      <button class="step-tab" data-step="2">담은 책 <span class="tab-badge hidden" id="tabBadge">0</span></button>
+      <button class="step-tab" data-step="3">매장</button>
+      <button class="step-tab" data-step="4">다시 찾기</button>
     </nav>
 
     <main>
       <section class="search-section">
-        <h2>1. 책 검색하기</h2>
+        <h2>1. 검색</h2>
         <div class="search-box">
           <input type="text" id="searchInput" placeholder="책 제목을 입력하세요" />
           <button id="searchBtn">검색</button>
@@ -30,7 +31,7 @@
       </section>
 
       <section class="selected-section">
-        <h2>2. 선택한 책 (최대 3권)</h2>
+        <h2>2. 담은 책 (최대 3권)</h2>
         <div id="selectedBooks" class="selected-books">
           <p class="empty-message">검색 결과에서 책을 선택해주세요</p>
         </div>
@@ -39,12 +40,20 @@
           <p>합계 금액: <span id="totalPrice">0</span>원</p>
         </div>
         <button id="findStoresBtn" class="find-stores-btn" disabled>매장 찾기</button>
+        <button id="saveQueryBtn" class="save-query-btn" disabled>이 조합 저장하기</button>
       </section>
 
       <section class="result-section">
-        <h2>3. 검색 결과</h2>
+        <h2>3. 매장</h2>
         <div id="storeResults" class="store-results">
           <p class="empty-message">매장 찾기 버튼을 눌러주세요</p>
+        </div>
+      </section>
+
+      <section class="saved-section">
+        <h2>4. 다시 찾기 <span class="saved-count" id="savedCount">0/3</span></h2>
+        <div id="savedQueries">
+          <p class="empty-message">저장된 조합이 없습니다.<br>책을 선택하고 조합을 저장해보세요.</p>
         </div>
       </section>
     </main>
