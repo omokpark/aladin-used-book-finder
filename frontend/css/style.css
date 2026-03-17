@@ -616,9 +616,42 @@ footer {
   color: white;
 }
 
-/* 탭 네비게이터 - PC에서는 숨김 */
+/* 탭 네비게이터 */
 .step-tabs {
+  display: flex;
+  border-bottom: 2px solid #e0e0e0;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.step-tab {
+  flex: 1;
+  padding: 14px 8px;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  color: #999;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.step-tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+  font-weight: 700;
+}
+
+/* 비활성 섹션 숨김 */
+main > section {
   display: none;
+}
+
+main > section.active {
+  display: block;
 }
 
 .tab-badge {
@@ -673,42 +706,10 @@ footer {
     display: none;
   }
 
-  /* 탭 네비게이터 노출 */
-  .step-tabs {
-    display: flex;
-    border-bottom: 2px solid #e0e0e0;
-    background: white;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
+  /* 탭 폰트 크기 모바일 조정 */
   .step-tab {
-    flex: 1;
     padding: 12px 4px;
-    background: none;
-    border: none;
     font-size: 0.78rem;
-    color: #999;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-    font-weight: 500;
-  }
-
-  .step-tab.active {
-    color: #667eea;
-    border-bottom-color: #667eea;
-    font-weight: 700;
-  }
-
-  /* 섹션 탭 전환: 비활성 섹션 숨김 */
-  main > section {
-    display: none;
-  }
-
-  main > section.active {
-    display: block;
   }
 
   main {

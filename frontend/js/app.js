@@ -501,6 +501,15 @@ function displayStoreResults(data) {
   }
   storeResultsDiv.appendChild(summary);
 
+  if (data.validStores.length === 0) {
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-query-btn';
+    saveBtn.textContent = '이 조합 저장하기 (나중에 다시 확인)';
+    saveBtn.style.marginBottom = '20px';
+    saveBtn.addEventListener('click', saveCurrentQuery);
+    storeResultsDiv.appendChild(saveBtn);
+  }
+
   const storeDataMap = new Map();
   data.booksWithStores.forEach(book => {
     book.stores.forEach(store => {
