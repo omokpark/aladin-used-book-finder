@@ -5,34 +5,13 @@ let selectedBooks = [];
 let searchResults = [];
 let lastSearchData = null;
 
-// ── 모바일 탭 전환 ──────────────────────────────────────────
-const SECTION_CLASSES = ['search-section', 'selected-section', 'result-section', 'saved-section'];
-
-function goToStep(step) {
-  SECTION_CLASSES.forEach((cls, i) => {
-    const el = document.querySelector('.' + cls);
-    if (el) el.classList.toggle('active', i + 1 === step);
-  });
-  document.querySelectorAll('.step-tab').forEach(tab => {
-    tab.classList.toggle('active', parseInt(tab.dataset.step) === step);
-  });
-  
-  if (isMobile()) {
-    window.scrollTo(0, 0);
-  } else {
-    const targetSection = document.querySelector('.' + SECTION_CLASSES[step - 1]);
-    if (targetSection) {
-      targetSection.scrollIntoView({ behavior: 'smooth' });
-    }
+// ── 스크롤 이동 유틸리티 ──────────────────────────────────────────
+function scrollToSection(sectionId) {
+  const targetSection = document.getElementById(sectionId);
+  if (targetSection) {
+    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
-
-// 탭 버튼 이벤트 및 초기 활성 섹션 설정
-document.querySelectorAll('.step-tab').forEach(tab => {
-  tab.addEventListener('click', () => goToStep(parseInt(tab.dataset.step)));
-});
-// 모바일에서 첫 섹션 활성화
-document.querySelector('.search-section').classList.add('active');
 // ────────────────────────────────────────────────────────────
 
 // ── 조회 조합 저장 (LocalStorage) ───────────────────────────
@@ -55,8 +34,8 @@ function saveCurrentQuery() {
   const queries = getSavedQueries();
 
   if (queries.length >= MAX_SAVED_QUERIES) {
-    alert(`최대 ${MAX_SAVED_QUERIES}개까지 저장할 수 있습니다.\n"다시 찾기" 탭에서 기존 조합을 삭제해주세요.`);
-    goToStep(4);
+    alert(`최대 ${MAX_SAVED_QUERIES}개까지 저장할 수 있습니다.\n"다시 찾기" 영역에서 기존 조합을 삭제해주세요.`);
+    scrollToSection('section-saved');
     return;
   }
 
@@ -86,7 +65,8 @@ function saveCurrentQuery() {
   queries.push(newQuery);
   localStorage.setItem(SAVED_QUERIES_KEY, JSON.stringify(queries));
   renderSavedQueries();
-  alert('저장했습니다! "다시 찾기" 탭에서 확인하세요.');
+  alert('저장했습니다! "다시 찾기" 영역에서 확인하세요.');
+  scrollToSection('section-saved');
 }
 
 function deleteSavedQuery(id) {
@@ -211,6 +191,15 @@ const saveQueryBtn = document.getElementById('saveQueryBtn');
 const storeResultsDiv = document.getElementById('storeResults');
 const loadingOverlay = document.getElementById('loadingOverlay');
 
+const floatCountSpan = document.getElementById('floatCount');
+const floatPriceSpan = document.getElementById('floatPrice');
+const floatFindBtn = document.getElementById('floatFindBtn');
+const floatingSummary = document.getElementById('floatingSummary');
+
+if (floatFindBtn) {
+  floatFindBtn.addEventListener('click', findStores);
+}
+
 searchBtn.addEventListener('click', searchBooks);
 searchInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') {
@@ -305,23 +294,28 @@ function toggleBookSelection(book, bookCard) {
 function updateSelectedBooks() {
   selectedCountSpan.textContent = selectedBooks.length;
 
-  // 탭 배지 업데이트
-  const tabBadge = document.getElementById('tabBadge');
-  if (tabBadge) {
-    tabBadge.textContent = selectedBooks.length;
-    tabBadge.classList.toggle('hidden', selectedBooks.length === 0);
-  }
-
   if (selectedBooks.length === 0) {
     selectedBooksDiv.innerHTML = '<p class="empty-message">검색 결과에서 책을 선택해주세요</p>';
     totalPriceSpan.textContent = '0';
     findStoresBtn.disabled = true;
     saveQueryBtn.disabled = true;
+    
+    // 플로팅 바 숨김
+    if (floatingSummary) floatingSummary.classList.add('hidden');
+    if (floatFindBtn) floatFindBtn.disabled = true;
     return;
   }
 
   const total = selectedBooks.reduce((sum, book) => sum + (book.priceStandard || 0), 0);
   totalPriceSpan.textContent = total.toLocaleString();
+
+  // 플로팅 바 업데이트
+  if (floatingSummary) {
+    floatingSummary.classList.remove('hidden');
+    if (floatCountSpan) floatCountSpan.textContent = selectedBooks.length;
+    if (floatPriceSpan) floatPriceSpan.textContent = total.toLocaleString();
+    if (floatFindBtn) floatFindBtn.disabled = false;
+  }
 
   selectedBooksDiv.innerHTML = '';
 
@@ -402,7 +396,7 @@ async function findStores() {
     if (data.success) {
       lastSearchData = data;
       displayStoreResults(data);
-      goToStep(3); // 모바일: 결과 탭으로 자동 이동 (PC는 CSS가 무시)
+      scrollToSection('section-stores'); // 결과 영역으로 스크롤 이동
     } else {
       storeResultsDiv.innerHTML = '<p class="no-results">매장 검색 중 오류가 발생했습니다</p>';
     }

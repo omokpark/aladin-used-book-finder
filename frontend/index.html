@@ -13,50 +13,65 @@
       <p class="subtitle">2만원 이상 무료배송 가능한 매장을 찾아드립니다</p>
     </header>
 
-    <nav class="step-tabs" id="stepTabs">
-      <button class="step-tab active" data-step="1">검색</button>
-      <button class="step-tab" data-step="2">담은 책 <span class="tab-badge hidden" id="tabBadge">0</span></button>
-      <button class="step-tab" data-step="3">매장</button>
-      <button class="step-tab" data-step="4">다시 찾기</button>
-    </nav>
+    <div class="main-layout">
+      <!-- 메인 컨텐츠 영역 (PC 좌측, 모바일 세로 배치) -->
+      <div class="content-column">
+        <section class="search-section" id="section-search">
+          <h2>검색</h2>
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="책 제목을 입력하세요" />
+            <button id="searchBtn">검색</button>
+          </div>
+          <div id="searchResults" class="search-results"></div>
+        </section>
 
-    <main>
-      <section class="search-section">
-        <h2>1. 검색</h2>
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="책 제목을 입력하세요" />
-          <button id="searchBtn">검색</button>
-        </div>
-        <div id="searchResults" class="search-results"></div>
-      </section>
+        <!-- 모바일에서는 카트(담은 책)가 여기에 보일 수도 있지만, CSS 플로팅 바를 사용하므로 
+             본문 내에는 간략히 보여주거나 숨길 수 있습니다. 기본적으로 모바일에서도 본문에 보이게 둡니다. -->
+        <div class="mobile-cart-placeholder"></div>
 
-      <section class="selected-section">
-        <h2>2. 담은 책 (최대 3권)</h2>
-        <div id="selectedBooks" class="selected-books">
-          <p class="empty-message">검색 결과에서 책을 선택해주세요</p>
-        </div>
-        <div class="selected-info">
-          <p>선택한 책: <span id="selectedCount">0</span> / 3권</p>
-          <p>합계 금액: <span id="totalPrice">0</span>원</p>
-        </div>
-        <button id="findStoresBtn" class="find-stores-btn" disabled>매장 찾기</button>
-        <button id="saveQueryBtn" class="save-query-btn" disabled>이 조합 저장하기</button>
-      </section>
+        <section class="result-section" id="section-stores">
+          <h2>매장 결과</h2>
+          <div id="storeResults" class="store-results">
+            <p class="empty-message">책을 담고 매장 찾기 버튼을 눌러주세요</p>
+          </div>
+        </section>
 
-      <section class="result-section">
-        <h2>3. 매장</h2>
-        <div id="storeResults" class="store-results">
-          <p class="empty-message">매장 찾기 버튼을 눌러주세요</p>
-        </div>
-      </section>
+        <section class="saved-section" id="section-saved">
+          <h2>다시 찾기 <span class="saved-count" id="savedCount">0/3</span></h2>
+          <div id="savedQueries">
+            <p class="empty-message">저장된 조합이 없습니다.<br>책을 선택하고 조합을 저장해보세요.</p>
+          </div>
+        </section>
+      </div>
 
-      <section class="saved-section">
-        <h2>4. 다시 찾기 <span class="saved-count" id="savedCount">0/3</span></h2>
-        <div id="savedQueries">
-          <p class="empty-message">저장된 조합이 없습니다.<br>책을 선택하고 조합을 저장해보세요.</p>
+      <!-- 사이드바 카트 영역 (PC 우측 고정, 모바일에서는 본문 중간이나 하단에 표시) -->
+      <div class="sidebar-column" id="sidebarCart">
+        <div class="sticky-cart">
+          <section class="selected-section" id="section-selected">
+            <h2>담은 책 (최대 3권)</h2>
+            <div id="selectedBooks" class="selected-books">
+              <p class="empty-message">검색 결과에서 책을 선택해주세요</p>
+            </div>
+            <div class="selected-info">
+              <p>선택: <span id="selectedCount">0</span>/3</p>
+              <p>합계: <span id="totalPrice">0</span>원</p>
+            </div>
+            <button id="findStoresBtn" class="find-stores-btn" disabled>매장 찾기</button>
+            <button id="saveQueryBtn" class="save-query-btn" disabled>조합 저장하기</button>
+          </section>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
+
+    <!-- 모바일 하단 플로팅 바 -->
+    <div id="floatingSummary" class="floating-summary hidden">
+      <div class="float-info">
+        <span class="float-count">담은 책 <b id="floatCount">0</b>권</span>
+        <span class="float-price">총 <b id="floatPrice">0</b>원</span>
+      </div>
+      <button id="floatFindBtn" class="float-find-btn" disabled>매장 찾기</button>
+    </div>
+  </main>
 
     <footer>
       <p>알라딘 Open API와 웹 크롤링을 활용한 서비스입니다</p>
