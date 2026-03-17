@@ -16,7 +16,15 @@ function goToStep(step) {
   document.querySelectorAll('.step-tab').forEach(tab => {
     tab.classList.toggle('active', parseInt(tab.dataset.step) === step);
   });
-  window.scrollTo(0, 0);
+  
+  if (isMobile()) {
+    window.scrollTo(0, 0);
+  } else {
+    const targetSection = document.querySelector('.' + SECTION_CLASSES[step - 1]);
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 }
 
 // 탭 버튼 이벤트 및 초기 활성 섹션 설정
@@ -52,9 +60,9 @@ function saveCurrentQuery() {
     return;
   }
 
-  const newIds = selectedBooks.map(b => b.isbn13).sort().join(',');
+  const newIds = selectedBooks.map(b => b.itemId).sort().join(',');
   const isDuplicate = queries.some(q =>
-    q.books.map(b => b.isbn13).sort().join(',') === newIds
+    q.books.map(b => b.itemId).sort().join(',') === newIds
   );
   if (isDuplicate) {
     alert('이미 저장된 조합입니다.');
@@ -248,7 +256,7 @@ function displaySearchResults(books) {
     const bookCard = document.createElement('div');
     bookCard.className = 'book-card';
 
-    if (selectedBooks.find(b => b.isbn13 === book.isbn13)) {
+    if (selectedBooks.find(b => b.itemId === book.itemId)) {
       bookCard.classList.add('selected');
     }
 
@@ -277,7 +285,7 @@ function displaySearchResults(books) {
 }
 
 function toggleBookSelection(book, bookCard) {
-  const existingIndex = selectedBooks.findIndex(b => b.isbn13 === book.isbn13);
+  const existingIndex = selectedBooks.findIndex(b => b.itemId === book.itemId);
 
   if (existingIndex >= 0) {
     selectedBooks.splice(existingIndex, 1);
@@ -360,7 +368,7 @@ function updateSearchResultsSelection() {
 
   bookCards.forEach((card, index) => {
     const book = searchResults[index];
-    if (selectedBooks.find(b => b.isbn13 === book.isbn13)) {
+    if (selectedBooks.find(b => b.itemId === book.itemId)) {
       card.classList.add('selected');
     } else {
       card.classList.remove('selected');
