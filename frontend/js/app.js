@@ -490,7 +490,7 @@ function displayStoreResults(data) {
     summary.innerHTML = `
       <p><strong>⚠️ 2만원 이상 매장 없음</strong></p>
       <p><strong>📚 일부 재고 보유 매장:</strong> ${allStoresWithAnyBooks.length}개 (총 ${data.totalStoresChecked}개 매장 확인)</p>
-      <p style="color:#dc3545;margin-top:10px;">아래 매장들은 선택한 책 중 일부를 보유하고 있지만 합계가 2만원 미만입니다. (배송비 별도)</p>
+      <p style="color:#ef4444;margin-top:10px;">아래 매장들은 선택한 책 중 일부를 보유하고 있지만 합계가 2만원 미만입니다. (배송비 별도)</p>
     `;
   }
   storeResultsDiv.appendChild(summary);
@@ -536,7 +536,7 @@ function displayStoreResults(data) {
       `${index + 1}`,
       'store-card',
       'total-price',
-      '<span style="color:#28a745;">✓ 무료배송</span>'
+      '<span style="color:#10b981;">✓ 무료배송</span>'
     );
     storeResultsDiv.appendChild(card);
   });
@@ -547,7 +547,7 @@ function displayStoreResults(data) {
       `${freeShippingStores.length + index + 1}`,
       'store-card-no-free-shipping',
       'total-price-no-shipping',
-      '<span style="color:#dc3545;">+ 배송비 2,500원</span>'
+      '<span style="color:#ef4444;">+ 배송비 2,500원</span>'
     );
     storeResultsDiv.appendChild(card);
   });
@@ -568,9 +568,9 @@ function displayPartialStoreResults(data) {
   storeResultsDiv.innerHTML = '';
 
   const header = document.createElement('div');
-  header.style.cssText = 'margin-bottom:20px;padding:15px;background:#fff3cd;border-radius:8px;border:2px solid #ffc107;';
+  header.style.cssText = 'margin-bottom:20px;padding:15px;background:#fef3c7;border-radius:8px;border:2px solid #f59e0b;';
   header.innerHTML = `
-    <h3 style="color:#856404;margin-bottom:10px;">📋 부분 재고 내역</h3>
+    <h3 style="color:#b45309;margin-bottom:10px;">📋 부분 재고 내역</h3>
     <p>선택한 책들 중 일부를 보유한 매장들의 정보입니다.</p>
   `;
   storeResultsDiv.appendChild(header);
