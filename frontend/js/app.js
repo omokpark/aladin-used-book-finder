@@ -509,6 +509,9 @@ function displayStoreResults(data) {
   const freeShippingStores = allStores.filter(store => store.totalPrice >= data.minTotalPrice);
   const paidShippingStores = allStores.filter(store => store.totalPrice < data.minTotalPrice);
 
+  let displayedCount = 0;
+  const hiddenCards = [];
+
   freeShippingStores.forEach((store, index) => {
     const card = buildStoreCard(
       store,
@@ -517,7 +520,12 @@ function displayStoreResults(data) {
       'total-price',
       '<span style="color:#10b981;">✓ 무료배송</span>'
     );
+    if (displayedCount >= 2) {
+      card.style.display = 'none';
+      hiddenCards.push(card);
+    }
     storeResultsDiv.appendChild(card);
+    displayedCount++;
   });
 
   paidShippingStores.forEach((store, index) => {
@@ -528,8 +536,36 @@ function displayStoreResults(data) {
       'total-price-no-shipping',
       '<span style="color:#ef4444;">+ 배송비 2,500원</span>'
     );
+    if (displayedCount >= 2) {
+      card.style.display = 'none';
+      hiddenCards.push(card);
+    }
     storeResultsDiv.appendChild(card);
+    displayedCount++;
   });
+
+  if (hiddenCards.length > 0) {
+    const moreBtnWrap = document.createElement('div');
+    moreBtnWrap.style.cssText = 'text-align:center; margin-top: 5px; margin-bottom: 30px;';
+    
+    const moreBtn = document.createElement('button');
+    moreBtn.className = 'detail-btn';
+    moreBtn.innerHTML = `모든 매장 더보기 <span style="font-weight:normal; font-size:0.95rem;">(${hiddenCards.length}개 숨김)</span> ▼`;
+    
+    moreBtn.addEventListener('click', () => {
+      hiddenCards.forEach(c => {
+        c.style.display = 'block';
+        c.animate([
+          { opacity: 0, transform: 'translateY(-10px)' },
+          { opacity: 1, transform: 'none' }
+        ], { duration: 350, easing: 'ease-out' });
+      });
+      moreBtnWrap.remove();
+    });
+    
+    moreBtnWrap.appendChild(moreBtn);
+    storeResultsDiv.appendChild(moreBtnWrap);
+  }
 
   if (data.allStoresWithBooks.length === 0 && allStoresWithAnyBooks.length > 0) {
     const buttonContainer = document.createElement('div');
