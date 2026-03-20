@@ -37,7 +37,9 @@ header h1 {
 }
 
 .subtitle {
-  display: none;
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-top: 5px;
 }
 
 main {
