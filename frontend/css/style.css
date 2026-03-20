@@ -8,7 +8,7 @@ body {
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f8fafc; /* Soft slate background */
   min-height: 100vh;
-  padding: 40px 20px;
+  padding: 20px 10px;
   color: #0f172a; /* Slate text */
 }
 
@@ -24,38 +24,37 @@ body {
 header {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); /* Clean white to slate */
   color: #1e293b;
-  padding: 60px 40px;
+  padding: 20px 40px;
   text-align: center;
   border-bottom: 1px solid #e2e8f0;
 }
 
 header h1 {
-  font-size: 2.4rem;
-  margin-bottom: 15px;
+  font-size: 1.5rem;
+  margin-bottom: 0px;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
 .subtitle {
-  font-size: 1.15rem;
-  color: #64748b;
+  display: none;
 }
 
 main {
-  padding: 60px;
+  padding: 30px 40px;
 }
 
 section {
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 
 h2 {
   color: #1e293b;
-  margin-bottom: 30px;
-  font-size: 1.8rem;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
   font-weight: 600;
   border-bottom: 2px solid #ecdfe0;
-  padding-bottom: 15px;
+  padding-bottom: 10px;
 }
 
 .search-box {
@@ -721,7 +720,19 @@ footer {
 }
 
 .sidebar-column {
-  display: none;
+  display: block;
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+
+.sidebar-column .selected-section,
+.sidebar-column .saved-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+  margin-bottom: 20px;
 }
 
 main > section, .content-column > section {
@@ -744,8 +755,10 @@ main > section, .content-column > section {
     display: block;
     flex: 3.5;
     position: sticky;
-    top: 40px;
-    max-height: calc(100vh - 80px);
+    top: 20px;
+    margin-top: 0;
+    padding-bottom: 0;
+    max-height: calc(100vh - 40px);
     overflow-y: auto;
   }
   
@@ -757,74 +770,23 @@ main > section, .content-column > section {
     border-radius: 8px;
   }
   
-  .sidebar-column .selected-section {
-    margin-bottom: 0;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+  .sidebar-column .saved-query-card {
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+  .sidebar-column .saved-query-actions {
+    width: 100%;
+    flex-direction: row;
+    gap: 10px;
+  }
+  .sidebar-column .run-query-btn, .sidebar-column .delete-query-btn {
+    flex: 1;
+    text-align: center;
   }
 }
 
-/* 모바일 하단 플로팅 요약 바 */
-.floating-summary {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid #e2e8f0;
-  box-shadow: 0 -8px 25px rgba(15, 23, 42, 0.1);
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 1000;
-  transition: transform 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
-}
 
-.floating-summary.hidden {
-  transform: translateY(100%);
-}
-
-.floating-summary .float-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.floating-summary .float-count {
-  font-size: 0.95rem;
-  color: #64748b;
-}
-
-.floating-summary .float-price {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #2563eb;
-}
-
-.float-find-btn {
-  padding: 14px 28px;
-  background: #10b981;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.15rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.float-find-btn:disabled {
-  background: #cbd5e1;
-  color: #94a3b8;
-  cursor: not-allowed;
-  box-shadow: none;
-}
 
 /* 아코디언 버튼 - 기본 숨김, 모바일에서만 노출 */
 .accordion-toggle-btn {

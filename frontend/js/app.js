@@ -191,15 +191,6 @@ const saveQueryBtn = document.getElementById('saveQueryBtn');
 const storeResultsDiv = document.getElementById('storeResults');
 const loadingOverlay = document.getElementById('loadingOverlay');
 
-const floatCountSpan = document.getElementById('floatCount');
-const floatPriceSpan = document.getElementById('floatPrice');
-const floatFindBtn = document.getElementById('floatFindBtn');
-const floatingSummary = document.getElementById('floatingSummary');
-
-if (floatFindBtn) {
-  floatFindBtn.addEventListener('click', findStores);
-}
-
 searchBtn.addEventListener('click', searchBooks);
 searchInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') {
@@ -299,23 +290,11 @@ function updateSelectedBooks() {
     totalPriceSpan.textContent = '0';
     findStoresBtn.disabled = true;
     saveQueryBtn.disabled = true;
-    
-    // 플로팅 바 숨김
-    if (floatingSummary) floatingSummary.classList.add('hidden');
-    if (floatFindBtn) floatFindBtn.disabled = true;
     return;
   }
 
   const total = selectedBooks.reduce((sum, book) => sum + (book.priceStandard || 0), 0);
   totalPriceSpan.textContent = total.toLocaleString();
-
-  // 플로팅 바 업데이트
-  if (floatingSummary) {
-    floatingSummary.classList.remove('hidden');
-    if (floatCountSpan) floatCountSpan.textContent = selectedBooks.length;
-    if (floatPriceSpan) floatPriceSpan.textContent = total.toLocaleString();
-    if (floatFindBtn) floatFindBtn.disabled = false;
-  }
 
   selectedBooksDiv.innerHTML = '';
 

@@ -13,7 +13,7 @@
       <p class="subtitle">2만원 이상 무료배송 가능한 매장을 찾아드립니다</p>
     </header>
 
-    <div class="main-layout">
+    <main class="main-layout">
       <!-- 메인 컨텐츠 영역 (PC 좌측, 모바일 세로 배치) -->
       <div class="content-column">
         <section class="search-section" id="section-search">
@@ -36,12 +36,6 @@
           </div>
         </section>
 
-        <section class="saved-section" id="section-saved">
-          <h2>다시 찾기 <span class="saved-count" id="savedCount">0/3</span></h2>
-          <div id="savedQueries">
-            <p class="empty-message">저장된 조합이 없습니다.<br>책을 선택하고 조합을 저장해보세요.</p>
-          </div>
-        </section>
       </div>
 
       <!-- 사이드바 카트 영역 (PC 우측 고정, 모바일에서는 본문 중간이나 하단에 표시) -->
@@ -59,19 +53,16 @@
             <button id="findStoresBtn" class="find-stores-btn" disabled>매장 찾기</button>
             <button id="saveQueryBtn" class="save-query-btn" disabled>조합 저장하기</button>
           </section>
+
+          <section class="saved-section" id="section-saved">
+            <h2>다시 찾기 <span class="saved-count" id="savedCount">0/3</span></h2>
+            <div id="savedQueries">
+              <p class="empty-message">저장된 조합이 없습니다.<br>책을 선택하고 조합을 저장해보세요.</p>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
-
-    <!-- 모바일 하단 플로팅 바 -->
-    <div id="floatingSummary" class="floating-summary hidden">
-      <div class="float-info">
-        <span class="float-count">담은 책 <b id="floatCount">0</b>권</span>
-        <span class="float-price">총 <b id="floatPrice">0</b>원</span>
-      </div>
-      <button id="floatFindBtn" class="float-find-btn" disabled>매장 찾기</button>
-    </div>
-  </main>
+    </main>
 
     <footer>
       <p>알라딘 Open API와 웹 크롤링을 활용한 서비스입니다</p>
