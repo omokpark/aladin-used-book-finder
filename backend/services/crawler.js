@@ -146,11 +146,11 @@ async function findStoresWithBooks(books, minTotalPrice = 20000) {
 
     const allStoresWithBooks = Array.from(storeMap.values())
       .filter(store => store.hasAllBooks)
-      .sort((a, b) => a.totalPrice - b.totalPrice);
+      .sort((a, b) => b.totalPrice - a.totalPrice);
 
     const allStoresWithAnyBooks = Array.from(storeMap.values())
       .filter(store => store.books.length > 0)
-      .sort((a, b) => a.totalPrice - b.totalPrice);
+      .sort((a, b) => b.totalPrice - a.totalPrice);
 
     const validStores = allStoresWithAnyBooks.filter(store => store.canFreeShipping);
 

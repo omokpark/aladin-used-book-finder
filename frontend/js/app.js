@@ -628,7 +628,10 @@ function displayPartialStoreResults(data) {
     const storeList = document.createElement('div');
     storeList.className = 'partial-store-list';
 
-    book.stores.forEach((store) => {
+    const hiddenStoreItems = [];
+    // 책의 컨디션(가격)이 좋은 곳을 우선 노출하기 위해 가격 내림차순 정렬
+    book.stores.sort((a, b) => b.price - a.price);
+    book.stores.forEach((store, idx) => {
       const storeItem = document.createElement('div');
       storeItem.className = 'partial-store-item';
       storeItem.innerHTML = `
@@ -641,10 +644,39 @@ function displayPartialStoreResults(data) {
           <small>재고 ${store.stock}권</small>
         </div>
       `;
+      
+      if (idx >= 3) {
+        storeItem.style.display = 'none';
+        hiddenStoreItems.push(storeItem);
+      }
       storeList.appendChild(storeItem);
     });
 
     bookSection.appendChild(storeList);
+
+    if (hiddenStoreItems.length > 0) {
+      const moreBtnWrap = document.createElement('div');
+      moreBtnWrap.style.cssText = 'text-align:center; margin-top: 10px;';
+      const moreBtn = document.createElement('button');
+      moreBtn.className = 'detail-btn';
+      moreBtn.style.fontSize = '0.9rem';
+      moreBtn.style.padding = '8px 20px';
+      moreBtn.innerHTML = `이 도서 보유 매장 더보기 (${hiddenStoreItems.length}개) ▼`;
+      
+      moreBtn.addEventListener('click', () => {
+        hiddenStoreItems.forEach(item => {
+          item.style.display = 'flex';
+          item.animate([
+            { opacity: 0, transform: 'translateY(-5px)' },
+            { opacity: 1, transform: 'none' }
+          ], { duration: 300, easing: 'ease-out' });
+        });
+        moreBtnWrap.remove();
+      });
+      moreBtnWrap.appendChild(moreBtn);
+      bookSection.appendChild(moreBtnWrap);
+    }
+
     storeResultsDiv.appendChild(bookSection);
   });
 
