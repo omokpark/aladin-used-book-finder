@@ -524,6 +524,7 @@ function displayStoreResults(data) {
       <p>총 ${data.totalStoresChecked}개의 매장을 확인했습니다.</p>
     `;
     storeResultsDiv.appendChild(noResultDiv);
+    document.getElementById('mobileBottomSaveBtn').style.display = 'block';
     return;
   }
 
