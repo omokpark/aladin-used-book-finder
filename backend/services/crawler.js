@@ -39,26 +39,32 @@ async function getUsedBookStores(itemId, isbn13, priceStandard) {
       const storeText = $(element).text().trim();
       const storeName = storeText.replace('중고매장', '').trim();
 
-      // 매장 링크 추출 (PC용)
-      const storeLink = $(element).find('a').attr('href');
-      const fullStoreLink = storeLink ? `https://www.aladin.co.kr${storeLink}` : null;
-
-      // 모바일 링크 생성 - 개별 중고 매물 고유 ID(AddBook=UXXXXXXX) 추출
-      let mobileStoreLink = null;
+      // 개별 중고 매물 고유 ID(AddBook=UXXXXXXX) 추출 → PC/모바일 링크 생성
       const row = $(element).closest('tr');
       const addBookHref = row.find('a[href*="AddBook="]').attr('href');
+
+      let fullStoreLink = null;
+      let mobileStoreLink = null;
+
       if (addBookHref) {
         const isbnMatch = addBookHref.match(/AddBook=U(\d+)/);
         if (isbnMatch) {
-          mobileStoreLink = `https://www.aladin.co.kr/m/mproduct.aspx?ItemId=${isbnMatch[1]}`;
+          const usedItemId = isbnMatch[1];
+          fullStoreLink = `https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=${usedItemId}`;
+          mobileStoreLink = `https://www.aladin.co.kr/m/mproduct.aspx?ItemId=${usedItemId}`;
         }
       }
-      // fallback: SC/CID 방식
-      if (!mobileStoreLink && storeLink) {
-        const scMatch = storeLink.match(/SC=(\d+)/i);
-        const cidMatch = storeLink.match(/CID=(\d+)/i);
-        if (scMatch && cidMatch) {
-          mobileStoreLink = `https://www.aladin.co.kr/m/usedshop/c2cshop.aspx?sc=${scMatch[1]}&cid=${cidMatch[1]}`;
+
+      // fallback: 기존 SC/CID 방식
+      if (!fullStoreLink) {
+        const storeLink = $(element).find('a').attr('href');
+        if (storeLink) {
+          fullStoreLink = `https://www.aladin.co.kr${storeLink}`;
+          const scMatch = storeLink.match(/SC=(\d+)/i);
+          const cidMatch = storeLink.match(/CID=(\d+)/i);
+          if (scMatch && cidMatch) {
+            mobileStoreLink = `https://www.aladin.co.kr/m/usedshop/c2cshop.aspx?sc=${scMatch[1]}&cid=${cidMatch[1]}`;
+          }
         }
       }
 
