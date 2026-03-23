@@ -273,6 +273,10 @@ async function searchBooks() {
 function displaySearchResults(books) {
   searchResultsDiv.innerHTML = '';
 
+  if (storeResultsDiv.querySelector('.onboarding-card')) {
+    storeResultsDiv.innerHTML = '<p class="empty-message">책을 담고 매장 찾기를 눌러주세요</p>';
+  }
+
   books.forEach(book => {
     const bookCard = document.createElement('div');
     bookCard.className = 'book-card';
