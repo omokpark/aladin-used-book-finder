@@ -892,6 +892,29 @@ main > section, .content-column > section {
   border-radius: 8px;
 }
 
+.sheet-aladin-link {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #2563eb;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.sheet-aladin-link:hover {
+  text-decoration: underline;
+}
+
+.book-card-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: #2563eb;
+  text-decoration: none;
+}
+.book-card-link:hover {
+  text-decoration: underline;
+}
+
 .sheet-actions {
   display: flex;
   gap: 10px;

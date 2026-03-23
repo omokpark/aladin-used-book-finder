@@ -266,6 +266,17 @@ function displaySearchResults(books) {
     bookCard.appendChild(pAuthor);
     bookCard.appendChild(pPublisher);
 
+    if (book.link) {
+      const linkEl = document.createElement('a');
+      linkEl.href = safeSrc(book.link);
+      linkEl.textContent = '알라딘에서 보기';
+      linkEl.className = 'book-card-link';
+      linkEl.target = '_blank';
+      linkEl.rel = 'noopener noreferrer';
+      linkEl.addEventListener('click', e => e.stopPropagation());
+      bookCard.appendChild(linkEl);
+    }
+
     bookCard.addEventListener('click', () => toggleBookSelection(book, bookCard));
 
     searchResultsDiv.appendChild(bookCard);
@@ -731,6 +742,13 @@ function openMobileSheet(book, bookCard) {
   document.getElementById('sheetPrice').textContent = book.priceStandard
     ? `정가 ${book.priceStandard.toLocaleString()}원`
     : '';
+  const sheetLink = document.getElementById('sheetLink');
+  if (book.link) {
+    sheetLink.href = safeSrc(book.link);
+    sheetLink.style.display = 'block';
+  } else {
+    sheetLink.style.display = 'none';
+  }
 
   const isSelected = selectedBooks.some(b => b.itemId === book.itemId);
   const isFull = selectedBooks.length >= 3 && !isSelected;
