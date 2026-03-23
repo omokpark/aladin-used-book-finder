@@ -432,6 +432,104 @@ h2 {
   margin-bottom: 16px;
 }
 
+/* ── 온보딩 / 저장 조합 미리보기 / 캐시 배너 ── */
+.onboarding-card {
+  padding: 40px 30px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.onboarding-desc {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+.onboarding-sub {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 32px;
+}
+.onboarding-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.onboarding-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.onboarding-step-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+.onboarding-step-text {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+}
+.onboarding-arrow {
+  font-size: 1.2rem;
+  color: #cbd5e1;
+  margin-top: -16px;
+}
+
+.results-saved-header {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+.results-saved-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  background: white;
+}
+
+.cache-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fef9ec;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  color: #92400e;
+}
+.cache-refresh-btn {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cache-refresh-btn:hover {
+  background: #d97706;
+}
+
 .empty-message {
   text-align: center;
   color: #94a3b8;

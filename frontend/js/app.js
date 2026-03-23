@@ -7,6 +7,37 @@ let lastSearchData = null;
 let sheetBook = null;
 let sheetBookCard = null;
 
+// ── 마지막 조회 결과 캐싱 ────────────────────────────────────────
+const LAST_RESULT_KEY = 'aladinLastResult';
+const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
+
+function saveLastResult(data) {
+  try {
+    localStorage.setItem(LAST_RESULT_KEY, JSON.stringify({
+      timestamp: Date.now(),
+      selectedBooks: selectedBooks.map(b => ({
+        isbn13: b.isbn13, title: b.title, author: b.author,
+        cover: b.cover, itemId: b.itemId, priceStandard: b.priceStandard,
+        publisher: b.publisher, link: b.link
+      })),
+      resultData: data
+    }));
+  } catch (e) {}
+}
+
+function getLastResult() {
+  try {
+    const cache = JSON.parse(localStorage.getItem(LAST_RESULT_KEY));
+    if (!cache?.timestamp || !cache?.resultData) return null;
+    if (Date.now() - cache.timestamp > CACHE_EXPIRY_MS) {
+      localStorage.removeItem(LAST_RESULT_KEY);
+      return null;
+    }
+    return cache;
+  } catch { return null; }
+}
+// ─────────────────────────────────────────────────────────────────
+
 // ── 스크롤 이동 유틸리티 ──────────────────────────────────────────
 function scrollToSection(sectionId) {
   const targetSection = document.getElementById(sectionId);
@@ -205,6 +236,8 @@ saveQueryBtn.addEventListener('click', saveCurrentQuery);
 
 // 저장된 조합 초기 렌더링
 renderSavedQueries();
+// 매장 결과 영역 초기화 (A/B/C)
+initResultsSection();
 document.getElementById('mobileOverlay').addEventListener('click', closeMobileSheet);
 document.getElementById('sheetCloseBtn').addEventListener('click', closeMobileSheet);
 document.getElementById('sheetAddBtn').addEventListener('click', confirmMobileBookAction);
@@ -400,6 +433,7 @@ async function findStores() {
 
     if (data.success) {
       lastSearchData = data;
+      saveLastResult(data);
       displayStoreResults(data);
       scrollToSection('section-stores'); // 결과 영역으로 스크롤 이동
     } else {
@@ -832,3 +866,91 @@ function updateMobileBottomBar() {
     findBtn.disabled = false;
   }
 }
+
+// ── 매장 결과 영역 초기 상태 (A/B/C) ────────────────────────────
+function initResultsSection() {
+  const cache = getLastResult();
+  const savedQueries = getSavedQueries();
+
+  if (cache) {
+    showCachedResults(cache);
+  } else if (savedQueries.length > 0) {
+    showSavedQueriesInResults(savedQueries);
+  } else {
+    showOnboarding();
+  }
+}
+
+function showOnboarding() {
+  storeResultsDiv.innerHTML = `
+    <div class="onboarding-card">
+      <p class="onboarding-desc">알라딘 중고책방에서 원하는 책들을 배송료없이 살 수 있는 매장을 찾아드립니다.</p>
+      <p class="onboarding-sub">원하는 조합을 저장해두면 나중에 편하게 다시 찾을 수 있어요.</p>
+      <div class="onboarding-steps">
+        <div class="onboarding-step">
+          <div class="onboarding-step-icon">📚</div>
+          <div class="onboarding-step-text">책 검색</div>
+        </div>
+        <div class="onboarding-arrow">→</div>
+        <div class="onboarding-step">
+          <div class="onboarding-step-icon">✅</div>
+          <div class="onboarding-step-text">최대 3권 담기</div>
+        </div>
+        <div class="onboarding-arrow">→</div>
+        <div class="onboarding-step">
+          <div class="onboarding-step-icon">🏪</div>
+          <div class="onboarding-step-text">매장 찾기</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function showSavedQueriesInResults(queries) {
+  storeResultsDiv.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.className = 'results-saved-header';
+  header.textContent = '저장해둔 조합이 있어요. 바로 조회해보세요.';
+  storeResultsDiv.appendChild(header);
+
+  queries.forEach(query => {
+    const card = document.createElement('div');
+    card.className = 'results-saved-card';
+
+    const tagsHtml = query.books
+      .map(b => `<span class="saved-book-tag">${escapeHtml(b.title)}</span>`)
+      .join('');
+
+    card.innerHTML = `
+      <div class="saved-query-info">
+        <div class="saved-books-list">${tagsHtml}</div>
+        <p class="saved-date">저장일: ${escapeHtml(query.savedAt)}</p>
+      </div>
+      <button class="run-query-btn">조회하기</button>
+    `;
+
+    card.querySelector('.run-query-btn').addEventListener('click', () => runSavedQuery(query));
+    storeResultsDiv.appendChild(card);
+  });
+}
+
+function showCachedResults(cache) {
+  const daysAgo = Math.floor((Date.now() - cache.timestamp) / (24 * 60 * 60 * 1000));
+  const timeText = daysAgo === 0 ? '오늘' : `${daysAgo}일 전`;
+
+  selectedBooks = [...cache.selectedBooks];
+  updateSelectedBooks();
+  lastSearchData = cache.resultData;
+  displayStoreResults(cache.resultData);
+
+  const banner = document.createElement('div');
+  banner.className = 'cache-banner';
+  banner.innerHTML = `
+    <span>🕐 ${timeText} 조회 결과입니다. 재고가 변동되었을 수 있습니다.</span>
+    <button class="cache-refresh-btn" id="cacheRefreshBtn">다시 조회</button>
+  `;
+  storeResultsDiv.insertBefore(banner, storeResultsDiv.firstChild);
+  document.getElementById('cacheRefreshBtn').addEventListener('click', findStores);
+}
+// ─────────────────────────────────────────────────────────────────
