@@ -487,9 +487,9 @@ function displayStoreResults(data) {
     `;
   }
   storeResultsDiv.appendChild(summary);
+  document.getElementById('mobileBottomSaveBtn').style.display = 'block';
 
   if (data.validStores.length === 0) {
-    document.getElementById('mobileBottomSaveBtn').style.display = 'block';
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-query-btn';
     saveBtn.textContent = '이 조합 저장하기 (나중에 다시 확인)';
