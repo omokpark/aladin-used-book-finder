@@ -317,7 +317,8 @@ function updateSelectedBooks() {
   }
 
   const total = selectedBooks.reduce((sum, book) => sum + (book.priceStandard || 0), 0);
-  totalPriceSpan.textContent = total.toLocaleString();
+  const estimated = Math.round(total * 0.7);
+  totalPriceSpan.textContent = estimated.toLocaleString();
 
   selectedBooksDiv.innerHTML = '';
 
@@ -820,7 +821,8 @@ function updateMobileBottomBar() {
   }
 
   const total = selectedBooks.reduce((sum, b) => sum + (b.priceStandard || 0), 0);
-  totalEl.textContent = `합계 ${total.toLocaleString()}원`;
+  const estimated = Math.round(total * 0.7);
+  totalEl.textContent = `예상 중고가 약 ${estimated.toLocaleString()}원`;
 
   if (selectedBooks.length === 0) {
     findBtn.textContent = '책을 선택해주세요';
