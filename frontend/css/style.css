@@ -956,7 +956,8 @@ main > section, .content-column > section {
   bottom: 0; left: 0; right: 0;
   background: white;
   border-top: 1px solid #e2e8f0;
-  padding: 16px 20px env(safe-area-inset-bottom, 28px);
+  padding: 16px 20px 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 100;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
   flex-direction: column;
@@ -1009,7 +1010,8 @@ main > section, .content-column > section {
   color: #0f172a;
 }
 .mobile-bottom-find-btn {
-  width: 100%;
+  width: calc(100% - 8px);
+  margin: 0 4px;
   padding: 13px;
   background: #10b981;
   color: white;
@@ -1025,7 +1027,8 @@ main > section, .content-column > section {
   cursor: not-allowed;
 }
 .mobile-bottom-save-btn {
-  width: 100%;
+  width: calc(100% - 8px);
+  margin: 0 4px;
   padding: 13px;
   background: #eff6ff;
   color: #2563eb;
