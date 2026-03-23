@@ -402,52 +402,40 @@ async function findStores() {
 
 function buildBookListHTML(books) {
   return books.map(book => `
-    <li>
-      <div>
-        <strong>${escapeHtml(book.title)}</strong><br/>
-        <small>${escapeHtml(book.author)} | 상태: ${escapeHtml(book.condition)}</small>
+    <li class="book-list-item">
+      <div class="book-list-info">
+        <strong>${escapeHtml(book.title)}</strong>
+        <small>${escapeHtml(book.condition)} · ${book.price.toLocaleString()}원</small>
       </div>
-      <div style="text-align: right;">
-        <strong>${book.price.toLocaleString()}원</strong><br/>
-        <small>재고: ${book.stock}권</small>
-      </div>
+      <span class="book-list-arrow">장바구니 →</span>
     </li>
   `).join('');
 }
 
 function buildStoreCard(store, label, cardClass, priceClass, priceLabel) {
   const storeCard = document.createElement('div');
-  storeCard.className = `${cardClass} store-card-clickable`;
+  storeCard.className = cardClass;
 
   storeCard.innerHTML = `
     <div class="store-card-header">
       <h3>${escapeHtml(label)}. ${escapeHtml(store.storeName)}</h3>
-      <button class="store-link-btn">매장 바로가기 →</button>
     </div>
     <p class="${priceClass}">합계: ${store.totalPrice.toLocaleString()}원 ${priceLabel}</p>
-    <button class="accordion-toggle-btn">책 목록 보기 ▼</button>
     <ul class="book-list">
       ${buildBookListHTML(store.books)}
     </ul>
   `;
 
-  const linkBtn = storeCard.querySelector('.store-link-btn');
-  linkBtn.addEventListener('click', (e) => openStoreLink(store, e));
-
-  // 아코디언 토글 (CSS에서 모바일에만 버튼 노출)
-  const accordionBtn = storeCard.querySelector('.accordion-toggle-btn');
-  const bookList = storeCard.querySelector('.book-list');
-  accordionBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = bookList.classList.toggle('open');
-    accordionBtn.textContent = isOpen ? '책 목록 접기 ▲' : '책 목록 보기 ▼';
+  // 책별 개별 링크 클릭 핸들러
+  storeCard.querySelectorAll('.book-list-item').forEach((li, idx) => {
+    const book = store.books[idx];
+    if (!book) return;
+    li.addEventListener('click', () => {
+      const link = isMobile() ? book.mobileStoreLink : book.storeLink;
+      if (!link) return;
+      isMobile() ? (window.location.href = link) : window.open(link, '_blank');
+    });
   });
-
-  // PC에서만 카드 전체 클릭으로 매장 이동
-  if (!isMobile()) {
-    storeCard.style.cursor = 'pointer';
-    storeCard.addEventListener('click', () => openStoreLink(store));
-  }
 
   return storeCard;
 }

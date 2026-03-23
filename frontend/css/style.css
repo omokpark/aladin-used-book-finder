@@ -353,6 +353,38 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.store-card .book-list li:hover,
+.store-card-no-free-shipping .book-list li:hover {
+  background: #f8fafc;
+}
+
+.book-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.book-list-info strong {
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.book-list-info small {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.book-list-arrow {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2563eb;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-left: 12px;
 }
 
 .store-card .book-list li:last-child,
@@ -1050,28 +1082,8 @@ main > section, .content-column > section {
     padding: 20px;
   }
 
-  .accordion-toggle-btn {
-    display: block;
-    width: 100%;
-    padding: 12px 16px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #475569;
-    cursor: pointer;
-    text-align: left;
-    margin-bottom: 0;
-  }
-
   .book-list {
-    display: none;
-    margin-top: 10px;
-  }
-
-  .book-list.open {
-    display: block;
+    margin-top: 0;
   }
 
   .store-card-clickable {
