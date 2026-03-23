@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Noto Sans KR', 'Segoe UI', sans-serif;
   background: #f8fafc; /* Soft slate background */
   min-height: 100vh;
   padding: 20px 10px;
@@ -30,6 +30,7 @@ header {
 }
 
 header h1 {
+  font-family: 'Noto Serif KR', serif;
   font-size: 1.5rem;
   margin-bottom: 0px;
   font-weight: 700;
@@ -51,6 +52,7 @@ section {
 }
 
 h2 {
+  font-family: 'Noto Serif KR', serif;
   color: #1e293b;
   margin-bottom: 20px;
   font-size: 1.2rem;
@@ -307,6 +309,7 @@ h2 {
 }
 
 .store-card h3 {
+  font-family: 'Noto Serif KR', serif;
   color: #1e293b;
   font-size: 1.25rem;
   margin: 0;
