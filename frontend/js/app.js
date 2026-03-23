@@ -187,7 +187,7 @@ function openStoreLink(store, event) {
     // 안드로이드: intent URI로 알라딘 앱 실행 시도, 미설치 시 모바일 웹 fallback
     const host = url.replace(/^https?:\/\//, '');
     const fallback = encodeURIComponent(url);
-    window.location.href = `intent://${host}#Intent;scheme=https;package=com.aladin.alladin;S.browser_fallback_url=${fallback};end`;
+    window.location.href = `intent://${host}#Intent;scheme=https;package=kr.co.aladin.third_shop;S.browser_fallback_url=${fallback};end`;
   } else {
     // iOS: <a> 태그 클릭으로 Universal Links 트리거 (앱 설치 시 앱, 미설치 시 Safari)
     const a = document.createElement('a');
