@@ -209,6 +209,7 @@ document.getElementById('mobileOverlay').addEventListener('click', closeMobileSh
 document.getElementById('sheetCloseBtn').addEventListener('click', closeMobileSheet);
 document.getElementById('sheetAddBtn').addEventListener('click', confirmMobileBookAction);
 document.getElementById('mobileBottomFindBtn').addEventListener('click', findStores);
+document.getElementById('mobileBottomSaveBtn').addEventListener('click', saveCurrentQuery);
 updateMobileBottomBar();
 
 async function searchBooks() {
@@ -369,6 +370,7 @@ async function findStores() {
 
   loadingOverlay.classList.remove('hidden');
   storeResultsDiv.innerHTML = '<p class="empty-message">매장을 검색하는 중입니다...</p>';
+  document.getElementById('mobileBottomSaveBtn').style.display = 'none';
 
   try {
     const response = await fetch(`${API_BASE_URL}/books/find-stores`, {
@@ -487,6 +489,7 @@ function displayStoreResults(data) {
   storeResultsDiv.appendChild(summary);
 
   if (data.validStores.length === 0) {
+    document.getElementById('mobileBottomSaveBtn').style.display = 'block';
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-query-btn';
     saveBtn.textContent = '이 조합 저장하기 (나중에 다시 확인)';

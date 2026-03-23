@@ -961,6 +961,17 @@ main > section, .content-column > section {
   color: #94a3b8;
   cursor: not-allowed;
 }
+.mobile-bottom-save-btn {
+  width: 100%;
+  padding: 13px;
+  background: none;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 
 /* 아코디언 버튼 - 기본 숨김, 모바일에서만 노출 */
 .accordion-toggle-btn {
