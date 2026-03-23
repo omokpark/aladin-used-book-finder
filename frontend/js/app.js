@@ -452,8 +452,31 @@ function buildStoreCard(store, label, cardClass, priceClass, priceLabel) {
   return storeCard;
 }
 
+function showLoginTipIfNeeded() {
+  if (!isMobile()) return;
+  if (localStorage.getItem('aladinLoginTipDismissed')) return;
+
+  const tip = document.createElement('div');
+  tip.style.cssText = 'margin-bottom:16px;padding:14px 16px;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;display:flex;gap:12px;align-items:flex-start;';
+  tip.innerHTML = `
+    <span style="font-size:1.3rem;flex-shrink:0;">💡</span>
+    <div style="flex:1;font-size:0.9rem;color:#92400e;line-height:1.5;">
+      <strong>장바구니에 바로 담으려면</strong><br>
+      매장 링크를 처음 열었을 때 알라딘에 <strong>1회 로그인</strong>해두면, 이후엔 자동 로그인으로 장바구니에 바로 담을 수 있어요.
+    </div>
+    <button style="flex-shrink:0;background:none;border:none;color:#b45309;font-size:1.1rem;cursor:pointer;padding:0 4px;" id="loginTipDismiss">✕</button>
+  `;
+  tip.querySelector('#loginTipDismiss').addEventListener('click', () => {
+    localStorage.setItem('aladinLoginTipDismissed', '1');
+    tip.remove();
+  });
+  storeResultsDiv.appendChild(tip);
+}
+
 function displayStoreResults(data) {
   storeResultsDiv.innerHTML = '';
+
+  showLoginTipIfNeeded();
 
   const allStoresWithAnyBooks = data.booksWithStores
     .flatMap(book => book.stores.map(store => store.storeName))
