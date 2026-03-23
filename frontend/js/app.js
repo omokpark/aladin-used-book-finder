@@ -525,6 +525,12 @@ function displayStoreResults(data) {
     `;
     storeResultsDiv.appendChild(noResultDiv);
     document.getElementById('mobileBottomSaveBtn').style.display = 'block';
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-query-btn';
+    saveBtn.textContent = '이 조합 저장하기 (나중에 다시 확인)';
+    saveBtn.style.marginTop = '16px';
+    saveBtn.addEventListener('click', saveCurrentQuery);
+    storeResultsDiv.appendChild(saveBtn);
     return;
   }
 
