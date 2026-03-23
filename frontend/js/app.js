@@ -4,6 +4,8 @@ const API_BASE_URL = window.location.origin + '/api';
 let selectedBooks = [];
 let searchResults = [];
 let lastSearchData = null;
+let sheetBook = null;
+let sheetBookCard = null;
 
 // ── 스크롤 이동 유틸리티 ──────────────────────────────────────────
 function scrollToSection(sectionId) {
@@ -203,6 +205,11 @@ saveQueryBtn.addEventListener('click', saveCurrentQuery);
 
 // 저장된 조합 초기 렌더링
 renderSavedQueries();
+document.getElementById('mobileOverlay').addEventListener('click', closeMobileSheet);
+document.getElementById('sheetCloseBtn').addEventListener('click', closeMobileSheet);
+document.getElementById('sheetAddBtn').addEventListener('click', confirmMobileBookAction);
+document.getElementById('mobileBottomFindBtn').addEventListener('click', findStores);
+updateMobileBottomBar();
 
 async function searchBooks() {
   const query = searchInput.value.trim();
@@ -265,6 +272,10 @@ function displaySearchResults(books) {
 }
 
 function toggleBookSelection(book, bookCard) {
+  if (window.innerWidth <= 768) {
+    openMobileSheet(book, bookCard);
+    return;
+  }
   const existingIndex = selectedBooks.findIndex(b => b.itemId === book.itemId);
 
   if (existingIndex >= 0) {
@@ -329,6 +340,7 @@ function updateSelectedBooks() {
   saveQueryBtn.disabled = selectedBooks.length === 0;
 
   updateSearchResultsSelection();
+  updateMobileBottomBar();
 }
 
 function removeBook(index) {
@@ -690,4 +702,99 @@ function displayPartialStoreResults(data) {
       displayStoreResults(lastSearchData);
     }
   });
+}
+
+function openMobileSheet(book, bookCard) {
+  sheetBook = book;
+  sheetBookCard = bookCard;
+
+  const coverEl = document.getElementById('sheetCover');
+  coverEl.src = safeSrc(book.cover);
+  coverEl.alt = escapeHtml(book.title);
+  document.getElementById('sheetTitle').textContent = book.title;
+  document.getElementById('sheetAuthor').textContent = book.author;
+  document.getElementById('sheetPublisher').textContent = book.publisher;
+  document.getElementById('sheetPrice').textContent = book.priceStandard
+    ? `정가 ${book.priceStandard.toLocaleString()}원`
+    : '';
+
+  const isSelected = selectedBooks.some(b => b.itemId === book.itemId);
+  const isFull = selectedBooks.length >= 3 && !isSelected;
+  const addBtn = document.getElementById('sheetAddBtn');
+
+  if (isSelected) {
+    addBtn.textContent = '담기 취소';
+    addBtn.className = 'sheet-add-btn sheet-remove';
+    addBtn.disabled = false;
+    document.getElementById('sheetNote').textContent = '이미 담긴 책입니다. 취소할 수 있어요.';
+  } else if (isFull) {
+    addBtn.textContent = '담기';
+    addBtn.className = 'sheet-add-btn';
+    addBtn.disabled = true;
+    document.getElementById('sheetNote').textContent = '⚠️ 최대 3권까지 담을 수 있습니다.';
+  } else {
+    addBtn.textContent = '담기';
+    addBtn.className = 'sheet-add-btn';
+    addBtn.disabled = false;
+    document.getElementById('sheetNote').textContent = '이 책을 담으시겠어요?';
+  }
+
+  document.getElementById('mobileOverlay').classList.add('show');
+  document.getElementById('mobileSheet').classList.add('show');
+}
+
+function closeMobileSheet() {
+  document.getElementById('mobileOverlay').classList.remove('show');
+  document.getElementById('mobileSheet').classList.remove('show');
+  sheetBook = null;
+  sheetBookCard = null;
+}
+
+function confirmMobileBookAction() {
+  if (!sheetBook) return;
+  const existingIndex = selectedBooks.findIndex(b => b.itemId === sheetBook.itemId);
+  if (existingIndex >= 0) {
+    selectedBooks.splice(existingIndex, 1);
+    if (sheetBookCard) sheetBookCard.classList.remove('selected');
+  } else {
+    if (selectedBooks.length >= 3) return;
+    selectedBooks.push(sheetBook);
+    if (sheetBookCard) sheetBookCard.classList.add('selected');
+  }
+  updateSelectedBooks();
+  closeMobileSheet();
+}
+
+function updateMobileBottomBar() {
+  const chipsContainer = document.getElementById('mobileBottomChips');
+  const totalEl = document.getElementById('mobileBottomTotal');
+  const findBtn = document.getElementById('mobileBottomFindBtn');
+  if (!chipsContainer || !totalEl || !findBtn) return;
+
+  chipsContainer.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const chip = document.createElement('div');
+    if (selectedBooks[i]) {
+      chip.className = 'mobile-chip';
+      const img = document.createElement('img');
+      img.src = safeSrc(selectedBooks[i].cover);
+      img.alt = escapeHtml(selectedBooks[i].title);
+      chip.appendChild(img);
+    } else {
+      chip.className = 'mobile-chip empty';
+      chip.textContent = String(i + 1);
+    }
+    chipsContainer.appendChild(chip);
+  }
+
+  const total = selectedBooks.reduce((sum, b) => sum + (b.priceStandard || 0), 0);
+  totalEl.textContent = `합계 ${total.toLocaleString()}원`;
+
+  if (selectedBooks.length === 0) {
+    findBtn.textContent = '책을 선택해주세요';
+    findBtn.disabled = true;
+  } else {
+    findBtn.textContent = `매장 찾기 (${selectedBooks.length}권)`;
+    findBtn.disabled = false;
+  }
 }

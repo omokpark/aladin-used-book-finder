@@ -73,6 +73,37 @@
     <p>매장을 검색하는 중입니다...</p>
   </div>
 
+  <!-- 모바일: 바텀 시트 오버레이 -->
+  <div id="mobileOverlay" class="mobile-overlay"></div>
+
+  <!-- 모바일: 책 상세 바텀 시트 -->
+  <div id="mobileSheet" class="mobile-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-book-preview">
+      <img id="sheetCover" src="" alt="">
+      <div class="sheet-book-info">
+        <h3 id="sheetTitle"></h3>
+        <p id="sheetAuthor"></p>
+        <p id="sheetPublisher"></p>
+        <p id="sheetPrice"></p>
+      </div>
+    </div>
+    <p id="sheetNote" class="sheet-note"></p>
+    <div class="sheet-actions">
+      <button class="sheet-close-btn" id="sheetCloseBtn">닫기</button>
+      <button class="sheet-add-btn" id="sheetAddBtn">담기</button>
+    </div>
+  </div>
+
+  <!-- 모바일: 하단 고정 바 -->
+  <div id="mobileBottomBar" class="mobile-bottom-bar">
+    <div class="mobile-bottom-bar-info">
+      <div id="mobileBottomChips" class="mobile-bottom-chips"></div>
+      <span id="mobileBottomTotal" class="mobile-bottom-total">합계 0원</span>
+    </div>
+    <button id="mobileBottomFindBtn" class="mobile-bottom-find-btn" disabled>책을 선택해주세요</button>
+  </div>
+
   <script src="js/app.js"></script>
 </body>
 </html>

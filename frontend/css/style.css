@@ -794,6 +794,174 @@ main > section, .content-column > section {
 
 
 
+/* ── 모바일 전용: 오버레이, 바텀 시트, 하단 바 ── */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+}
+.mobile-overlay.show { display: block; }
+
+.mobile-sheet {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  padding: 0 20px 30px;
+  z-index: 201;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.12);
+}
+.mobile-sheet.show { display: block; }
+
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  margin: 14px auto 18px;
+}
+
+.sheet-book-preview {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.sheet-book-preview img {
+  width: 72px; height: 96px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: #f1f5f9;
+}
+.sheet-book-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sheet-book-info p {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 3px;
+}
+
+.sheet-note {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+}
+.sheet-close-btn {
+  flex: 1;
+  padding: 13px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  font-size: 0.95rem;
+  color: #475569;
+  cursor: pointer;
+}
+.sheet-add-btn {
+  flex: 2;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sheet-add-btn.sheet-remove {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.sheet-add-btn:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.mobile-bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  padding: 12px 20px 24px;
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  flex-direction: column;
+  gap: 10px;
+}
+.mobile-bottom-bar-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mobile-bottom-chips {
+  display: flex;
+  gap: 8px;
+}
+.mobile-chip {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #2563eb;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+.mobile-chip.empty {
+  border-color: #e2e8f0;
+  background: #f8fafc;
+  color: #cbd5e1;
+}
+.mobile-chip img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.mobile-bottom-total {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.mobile-bottom-find-btn {
+  width: 100%;
+  padding: 13px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.mobile-bottom-find-btn:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
 /* 아코디언 버튼 - 기본 숨김, 모바일에서만 노출 */
 .accordion-toggle-btn {
   display: none;
@@ -912,5 +1080,18 @@ main > section, .content-column > section {
 
   footer {
     display: none;
+  }
+
+  /* 사이드바 → 하단 바로 대체 */
+  .sidebar-column {
+    display: none;
+  }
+
+  main {
+    padding-bottom: 140px;
+  }
+
+  .mobile-bottom-bar {
+    display: flex;
   }
 }
