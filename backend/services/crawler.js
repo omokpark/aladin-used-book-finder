@@ -39,21 +39,22 @@ async function getUsedBookStores(itemId, isbn13, priceStandard) {
       const storeText = $(element).text().trim();
       const storeName = storeText.replace('중고매장', '').trim();
 
-      // 개별 중고 매물 고유 ID(AddBook=UXXXXXXX) 추출 → PC/모바일 링크 생성
+      // 개별 중고 매물 상품 ID 추출: AddBook의 U-ID가 아닌 wroduct.aspx?ItemId= 사용
+      // (AddBook의 U-ID는 장바구니용 내부 ISBN이며, 상품 페이지 ItemId와 다름)
       const row = $(element).closest('tr');
-      const addBookHref = row.find('a[href*="AddBook="]').attr('href');
-
       let fullStoreLink = null;
       let mobileStoreLink = null;
 
-      if (addBookHref) {
-        const isbnMatch = addBookHref.match(/AddBook=U(\d+)/);
-        if (isbnMatch) {
-          const usedItemId = isbnMatch[1];
-          fullStoreLink = `https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=${usedItemId}`;
-          mobileStoreLink = `https://www.aladin.co.kr/m/mproduct.aspx?ItemId=${usedItemId}`;
+      // 같은 행에서 wroduct.aspx?ItemId= 링크 추출 (카탈로그 itemId 제외)
+      const productLinks = row.find('a[href*="wproduct.aspx?ItemId="]');
+      productLinks.each((_, a) => {
+        const m = $(a).attr('href').match(/ItemId=(\d+)/);
+        if (m && m[1] !== String(itemId)) {
+          fullStoreLink = `https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=${m[1]}`;
+          mobileStoreLink = `https://www.aladin.co.kr/m/mproduct.aspx?ItemId=${m[1]}`;
+          return false; // break
         }
-      }
+      });
 
       // fallback: 기존 SC/CID 방식
       if (!fullStoreLink) {
