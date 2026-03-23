@@ -934,10 +934,24 @@ function showSavedQueriesInResults(queries) {
         <div class="saved-books-list">${tagsHtml}</div>
         <p class="saved-date">저장일: ${escapeHtml(query.savedAt)}</p>
       </div>
-      <button class="run-query-btn">조회하기</button>
+      <div class="saved-query-actions">
+        <button class="run-query-btn">조회하기</button>
+        <button class="delete-query-btn">삭제</button>
+      </div>
     `;
 
     card.querySelector('.run-query-btn').addEventListener('click', () => runSavedQuery(query));
+    card.querySelector('.delete-query-btn').addEventListener('click', () => {
+      if (confirm('이 조합을 삭제할까요?')) {
+        deleteSavedQuery(query.id);
+        const remaining = getSavedQueries();
+        if (remaining.length > 0) {
+          showSavedQueriesInResults(remaining);
+        } else {
+          showOnboarding();
+        }
+      }
+    });
     storeResultsDiv.appendChild(card);
   });
 }
