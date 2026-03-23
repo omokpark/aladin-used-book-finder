@@ -891,7 +891,7 @@ function initResultsSection() {
 function showOnboarding() {
   storeResultsDiv.innerHTML = `
     <div class="onboarding-card">
-      <p class="onboarding-desc">알라딘 중고책방에서 원하는 책들을 배송료없이 살 수 있는 매장을 찾아드립니다.</p>
+      <p class="onboarding-desc">원하는 책들을 배송료없이 살 수 있는 알라딘 매장을 찾아드립니다.</p>
       <p class="onboarding-sub">원하는 조합을 저장해두면 나중에 편하게 다시 찾을 수 있어요.</p>
       <div class="onboarding-steps">
         <div class="onboarding-step">
