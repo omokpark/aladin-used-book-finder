@@ -161,7 +161,7 @@ function getAppropriateLink(store) {
   return book.storeLink || '#';
 }
 
-// 앱 딥링크 방식으로 매장 링크 열기
+// 매장 링크 열기
 function openStoreLink(store, event) {
   if (event) {
     event.preventDefault();
@@ -175,26 +175,10 @@ function openStoreLink(store, event) {
   const mobileLink = book.mobileStoreLink;
   const pcLink = book.storeLink;
 
-  if (!mobile) {
-    window.open(pcLink || '#', '_blank');
-    return;
-  }
-
-  const url = mobileLink || pcLink;
-  if (!url) return;
-
-  if (/Android/i.test(navigator.userAgent)) {
-    // 안드로이드: intent URI로 알라딘 앱 실행 시도, 미설치 시 모바일 웹 fallback
-    const host = url.replace(/^https?:\/\//, '');
-    const fallback = encodeURIComponent(url);
-    window.location.href = `intent://${host}#Intent;scheme=https;package=kr.co.aladin.third_shop;S.browser_fallback_url=${fallback};end`;
+  if (mobile && mobileLink) {
+    window.location.href = mobileLink;
   } else {
-    // iOS: <a> 태그 클릭으로 Universal Links 트리거 (앱 설치 시 앱, 미설치 시 Safari)
-    const a = document.createElement('a');
-    a.href = url;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.open(pcLink || '#', '_blank');
   }
 }
 
