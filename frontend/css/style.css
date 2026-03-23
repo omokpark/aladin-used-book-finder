@@ -1034,7 +1034,9 @@ main > section, .content-column > section {
   }
 
   .subtitle {
-    display: none;
+    display: block;
+    font-size: 0.82rem;
+    margin-top: 4px;
   }
 
   main {
