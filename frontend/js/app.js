@@ -861,8 +861,11 @@ function initResultsSection() {
 function showOnboarding() {
   storeResultsDiv.innerHTML = `
     <div class="onboarding-card">
-      <p class="onboarding-desc">배송료없는 중고매장을 한번에 찾아드립니다!!</p>
-      <p class="onboarding-sub">원하는 조합을 저장해두세요. 편하게 다시 찾을 수 있어요.</p>
+      <p class="onboarding-desc">배송료 없는 중고매장을 한번에!!!</p>
+      <ul class="onboarding-sub-list">
+        <li>장바구니를 클릭하면 알라딘 페이지로~</li>
+        <li>원하는 조합을 저장! 다시 찾기 편해요!</li>
+      </ul>
       <div class="onboarding-steps">
         <div class="onboarding-step">
           <div class="onboarding-step-icon">📚</div>
@@ -877,6 +880,11 @@ function showOnboarding() {
         <div class="onboarding-step">
           <div class="onboarding-step-icon">🏪</div>
           <div class="onboarding-step-text">매장 찾기</div>
+        </div>
+        <div class="onboarding-arrow">→</div>
+        <div class="onboarding-step">
+          <div class="onboarding-step-icon">🛒</div>
+          <div class="onboarding-step-text">장바구니 클릭</div>
         </div>
       </div>
     </div>
