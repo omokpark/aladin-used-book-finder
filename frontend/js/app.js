@@ -7,36 +7,6 @@ let lastSearchData = null;
 let sheetBook = null;
 let sheetBookCard = null;
 
-// ── 마지막 조회 결과 캐싱 ────────────────────────────────────────
-const LAST_RESULT_KEY = 'aladinLastResult';
-const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
-
-function saveLastResult(data) {
-  try {
-    localStorage.setItem(LAST_RESULT_KEY, JSON.stringify({
-      timestamp: Date.now(),
-      selectedBooks: selectedBooks.map(b => ({
-        isbn13: b.isbn13, title: b.title, author: b.author,
-        cover: b.cover, itemId: b.itemId, priceStandard: b.priceStandard,
-        publisher: b.publisher, link: b.link
-      })),
-      resultData: data
-    }));
-  } catch (e) {}
-}
-
-function getLastResult() {
-  try {
-    const cache = JSON.parse(localStorage.getItem(LAST_RESULT_KEY));
-    if (!cache?.timestamp || !cache?.resultData) return null;
-    if (Date.now() - cache.timestamp > CACHE_EXPIRY_MS) {
-      localStorage.removeItem(LAST_RESULT_KEY);
-      return null;
-    }
-    return cache;
-  } catch { return null; }
-}
-// ─────────────────────────────────────────────────────────────────
 
 // ── 스크롤 이동 유틸리티 ──────────────────────────────────────────
 function scrollToSection(sectionId) {
@@ -437,7 +407,6 @@ async function findStores() {
 
     if (data.success) {
       lastSearchData = data;
-      saveLastResult(data);
       displayStoreResults(data);
       scrollToSection('section-stores'); // 결과 영역으로 스크롤 이동
     } else {
@@ -880,12 +849,9 @@ function updateMobileBottomBar() {
 
 // ── 매장 결과 영역 초기 상태 (A/B/C) ────────────────────────────
 function initResultsSection() {
-  const cache = getLastResult();
   const savedQueries = getSavedQueries();
 
-  if (cache) {
-    showCachedResults(cache);
-  } else if (savedQueries.length > 0) {
+  if (savedQueries.length > 0) {
     showSavedQueriesInResults(savedQueries);
   } else {
     showOnboarding();
@@ -960,22 +926,4 @@ function showSavedQueriesInResults(queries) {
   });
 }
 
-function showCachedResults(cache) {
-  const daysAgo = Math.floor((Date.now() - cache.timestamp) / (24 * 60 * 60 * 1000));
-  const timeText = daysAgo === 0 ? '오늘' : `${daysAgo}일 전`;
-
-  selectedBooks = [...cache.selectedBooks];
-  updateSelectedBooks();
-  lastSearchData = cache.resultData;
-  displayStoreResults(cache.resultData);
-
-  const banner = document.createElement('div');
-  banner.className = 'cache-banner';
-  banner.innerHTML = `
-    <span>🕐 ${timeText} 조회 결과입니다. 재고가 변동되었을 수 있습니다.</span>
-    <button class="cache-refresh-btn" id="cacheRefreshBtn">다시 조회</button>
-  `;
-  storeResultsDiv.insertBefore(banner, storeResultsDiv.firstChild);
-  document.getElementById('cacheRefreshBtn').addEventListener('click', findStores);
-}
 // ─────────────────────────────────────────────────────────────────
