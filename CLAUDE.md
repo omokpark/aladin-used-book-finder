@@ -187,6 +187,60 @@ git push origin main
 - 커밋 전 `git status`로 의도치 않은 파일 포함 여부 반드시 확인
 - CLAUDE.md의 TODO 항목은 작업 완료 시 업데이트
 
+## 장애 대응 학습 메모 (2026-03-24)
+
+### 사건 요약
+Render 무료 플랜에서 서버가 주기적으로 다운되는 문제 발생. UptimeRobot으로 핑을 날리고 있었는데도 죽었음.
+
+### 구조 이해
+```
+사용자 → Render 웹서버(로드밸런서) → 내 Express 서버
+```
+- Render는 단순 코드 실행 공간이 아니라, 앞에 자체 웹서버(로드밸런서)를 두고 요청을 중계함
+- Express 입장에서는 모든 요청이 Render 웹서버에서 오는 것처럼 보임 (실제 사용자 IP를 직접 볼 수 없음)
+
+### 진짜 원인
+`express-rate-limit` v7부터 `X-Forwarded-For` 헤더가 있는데 `trust proxy` 설정이 없으면 `ValidationError`를 던짐.
+→ 에러를 잡는 핸들러가 없었으니 Node.js 프로세스 전체가 종료됨
+→ Render가 재시작하는 사이클 반복
+
+### 적용한 해결책
+
+**1. trust proxy 설정** (`server.js`)
+```js
+app.set('trust proxy', 1);
+// Render 로드밸런서를 신뢰하고, 실제 사용자 IP(X-Forwarded-For)를 사용하도록 허용
+```
+
+**2. 전역 에러 핸들러** (`server.js`)
+```js
+process.on('uncaughtException', (err) => { console.error(err); });
+process.on('unhandledRejection', (reason) => { console.error(reason); });
+// 못 잡힌 에러가 발생해도 프로세스가 죽지 않고 로그만 남김
+```
+
+**3. axios 타임아웃** (`crawler.js`)
+```js
+axios.get(url, { timeout: 10000 })
+// 알라딘이 10초 내 응답 없으면 포기 — 무한 대기 방지
+```
+
+### 핵심 개념 정리
+
+| 용어 | 설명 |
+|------|------|
+| **로드밸런서** | 사용자 요청을 받아 내부 서버로 중계하는 Render의 웹서버 |
+| **trust proxy** | "중계 서버를 믿고, 그 서버가 알려주는 실제 사용자 정보를 써라" |
+| **Rate Limiting** | 특정 사용자가 단시간에 너무 많은 요청을 보내지 못하도록 제한 |
+| **에러 핸들링** | 예외 상황을 잡아서 처리하는 코드 (try-catch, uncaughtException 등) |
+| **장애 대응 체계** | 에러 핸들러(코드) + 모니터링(UptimeRobot) + 자동 재시작(Render) 조합 |
+
+### 교훈
+- 로컬에서 잘 되는데 배포하면 깨지는 건 대부분 **환경 차이** 문제
+- 프록시/로드밸런서 뒤에 Express 올릴 때는 `trust proxy` 설정이 기본
+- 에러 로그를 보면 원인이 나온다 — Render 대시보드 Logs 탭 먼저 확인할 것
+- UptimeRobot Uptime %와 Incidents 수치로 문제 패턴 파악 가능
+
 ## TODO
 
 - [ ] 책 상태 추정 로직 개선: 실제 크롤링으로 책 상태 정보 수집
