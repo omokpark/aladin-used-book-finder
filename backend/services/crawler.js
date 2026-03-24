@@ -20,7 +20,13 @@ function estimateCondition(usedPrice, standardPrice) {
   }
 }
 
+function logMemory(label) {
+  const mem = process.memoryUsage();
+  console.log(`[MEM] ${label} — RSS: ${Math.round(mem.rss / 1024 / 1024)}MB, Heap: ${Math.round(mem.heapUsed / 1024 / 1024)}/${Math.round(mem.heapTotal / 1024 / 1024)}MB`);
+}
+
 async function getUsedBookStores(itemId, isbn13, priceStandard) {
+  logMemory(`크롤링 시작 ItemId=${itemId}`);
   try {
     const url = `https://www.aladin.co.kr/shop/UsedShop/wuseditemall.aspx?ItemId=${itemId}&TabType=3`;
 
@@ -100,6 +106,7 @@ async function getUsedBookStores(itemId, isbn13, priceStandard) {
       }
     });
 
+    logMemory(`크롤링 완료 ItemId=${itemId}`);
     return stores;
   } catch (error) {
     console.error('Crawler error for ItemId', itemId, ':', error.message);
