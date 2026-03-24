@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -957,7 +959,7 @@ main > section, .content-column > section {
   bottom: 0; left: 0; right: 0;
   background: white;
   border-radius: 20px 20px 0 0;
-  padding: 0 20px 30px;
+  padding: 0 20px calc(30px + env(safe-area-inset-bottom, 0px));
   z-index: 201;
   box-shadow: 0 -8px 30px rgba(0,0,0,0.12);
 }
