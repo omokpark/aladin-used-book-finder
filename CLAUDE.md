@@ -241,6 +241,27 @@ axios.get(url, { timeout: 10000 })
 - 에러 로그를 보면 원인이 나온다 — Render 대시보드 Logs 탭 먼저 확인할 것
 - UptimeRobot Uptime %와 Incidents 수치로 문제 패턴 파악 가능
 
+## 다음 작업 (Google Analytics 4 연동)
+
+사용자 테스트 집계를 위한 GA4 이벤트 트래킹 추가 예정.
+
+### 준비사항
+1. Google Analytics(analytics.google.com) 접속 → 구글 계정으로 로그인
+2. 속성 만들기 → 측정 ID 발급 (G-XXXXXXXXXX 형태)
+3. 측정 ID를 Claude Code에 알려주면 바로 코드 작업 시작
+
+### 작업 내용 (Claude Code가 할 일)
+- `frontend/index.html` — GA4 스크립트 추가
+- `frontend/js/app.js` — 커스텀 이벤트 추가:
+  - 책 검색
+  - 책 선택/해제
+  - 매장 찾기 클릭
+  - 조합 저장
+  - 매장 결과 없음
+  - 에러 발생
+
+---
+
 ## TODO
 
 - [ ] 책 상태 추정 로직 개선: 실제 크롤링으로 책 상태 정보 수집
